@@ -1,17 +1,29 @@
-import React from 'react'
-import { Button } from '@material-ui/core'
-import { useTheme } from '@material-ui/styles'
+import React, { useEffect } from 'react'
+import { Link } from '@reach/router'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import firebase from 'firebase/app'
 
-function Home() {
-  const theme = useTheme()
+export default () => {
+  const options = {
+    pageSize: 10,
+    fields: 'files(id, name, webContentLink)'
+  }
+
+  const [user, initialising] = useAuthState(firebase.auth())
+
+  useEffect(() => {
+    async function fetchData() {
+      // const response = await window.gapi.client.drive.files.list(options)
+      // console.log(response)
+    }
+
+    fetchData()
+  })
+
   return (
     <>
       <h1>Home</h1>
-      <Button variant="contained" color="primary">
-        {theme.palette.primary.main}
-      </Button>
+      <Link to="/login">Hello page</Link>
     </>
   )
 }
-
-export default Home
