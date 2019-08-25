@@ -1,0 +1,120 @@
+import { useContext, useState, useEffect } from 'react'
+import { createInstance, INDEXEDDB } from 'localforage'
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import AppContext from '../contexts'
+
+// Your web app's Firebase configuration
+var firebaseConfig = {
+  apiKey: 'AIzaSyDBB3j0qJC2af95_456Gq87kiNDyPGv6-o',
+  authDomain: 'keepract.firebaseapp.com',
+  databaseURL: 'https://keepract.firebaseio.com',
+  projectId: 'keepract',
+  storageBucket: '',
+  messagingSenderId: '512352375225',
+  appId: '1:512352375225:web:192e3f121d8b8405'
+}
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig)
+
+const ACCESS_TOKEN_KEY = 'accessToken'
+const provider = new firebase.auth.GoogleAuthProvider()
+provider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly')
+
+const tokenStore = createInstance({
+  driver: INDEXEDDB,
+  name: 'keepract',
+  version: 1.0,
+  storeName: 'token_store'
+})
+
+const mapUser = firebaseUser => {
+  if (!firebaseUser) return null
+  const { email } = firebaseUser
+  return { email }
+}
+
+const useAuthContext = () => {
+  const { auth } = useContext(AppContext)
+  return auth
+}
+
+const useFirebase = () => {
+  const [state, setState] = useState(() => {
+    const user = firebase.auth().currentUser
+    return {
+      initialising: !user,
+      user: mapUser(user),
+      accessToken: null
+    }
+  })
+
+  useEffect(() => {
+    // Temp value to deal with async
+    let accessToken
+
+    // listen for auth state changes
+    const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
+      console.log('watch')
+      if (!accessToken) {
+        accessToken = await tokenStore.getItem(ACCESS_TOKEN_KEY)
+      }
+      // Need new access token
+      if (user && !accessToken) {
+        user.reauthenticateWithRedirect(provider)
+      } else {
+        // TODO: Revalidate access token
+        // const idToken = await user.getIdToken()
+        // const credential = firebase.auth.GoogleAuthProvider.credential(
+        //   idToken,
+        //   accessToken
+        // )
+        // await user.reauthenticateWithCredential(credential)
+        setState({
+          initialising: false,
+          user: mapUser(user)
+        })
+      }
+    })
+
+    // Login redirect handler
+    firebase
+      .auth()
+      .getRedirectResult()
+      .then(async result => {
+        console.log('redirect')
+        if (result.credential) {
+          // We need to store the result in a temp var because save to local storage is async
+          // and will happen AFTER the firebase onAuthStateChanged
+          accessToken = result.credential.accessToken
+          await tokenStore.setItem(ACCESS_TOKEN_KEY, accessToken)
+        }
+      })
+      .catch(error => {
+        // TODO: Handle errors
+        // Handle Errors here.
+        var errorCode = error.code
+        var errorMessage = error.message
+        // The email of the user's account used.
+        var email = error.email
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential
+        // ...
+      })
+
+    // unsubscribe to the listener when unmounting
+    return () => unsubscribe()
+  }, [])
+
+  return state
+}
+
+const login = () => {
+  firebase.auth().signInWithRedirect(provider)
+}
+const logout = async () => {
+  await tokenStore.removeItem(ACCESS_TOKEN_KEY, null)
+  firebase.auth().signOut()
+}
+
+export { useAuthContext, useFirebase, login, logout }

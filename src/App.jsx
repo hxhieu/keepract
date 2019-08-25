@@ -6,6 +6,8 @@ import { createMuiTheme } from '@material-ui/core/styles'
 import Login from './containers/Login'
 import Home from './containers/Home'
 import TopBar from './containers/TopBar'
+import { useFirebase } from './hooks/auth'
+import AppContext from './contexts'
 
 const theme = createMuiTheme({
   palette: {
@@ -14,17 +16,23 @@ const theme = createMuiTheme({
 })
 
 function App() {
+  const appContext = {
+    auth: useFirebase()
+  }
+
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <TopBar />
-      <Container maxWidth="md">
-        <Router>
-          <Home path="/" />
-          <Login path="/login" />
-        </Router>
-      </Container>
-    </ThemeProvider>
+    <AppContext.Provider value={appContext}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <TopBar />
+        <Container maxWidth="md">
+          <Router>
+            <Home path="/" />
+            <Login path="/login" />
+          </Router>
+        </Container>
+      </ThemeProvider>
+    </AppContext.Provider>
   )
 }
 

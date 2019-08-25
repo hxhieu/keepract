@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -6,9 +6,8 @@ import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import HomeIcon from '@material-ui/icons/Home'
-import { useAuthState } from 'react-firebase-hooks/auth'
-import firebase from 'firebase/app'
 import { navigate } from '@reach/router'
+import { useAuthContext, login, logout } from '../hooks/auth'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -24,40 +23,11 @@ const useStyles = makeStyles(theme => ({
 
 export default () => {
   const classes = useStyles()
-  const [user, initialising] = useAuthState(firebase.auth())
-  const provider = new firebase.auth.GoogleAuthProvider()
-  provider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly')
-  const options = {
-    pageSize: 10,
-    fields: 'files(id, name, webContentLink)'
-  }
+  const { initialising, user } = useAuthContext()
 
-  const login = () => {
-    firebase.auth().signInWithRedirect(provider)
-  }
-  const logout = () => {
-    firebase.auth().signOut()
-  }
   const gotoHome = () => {
     navigate('/')
   }
-
-  useEffect(() => {
-    // async function getToken() {
-    //   if (initialising || !user) return
-    //   const { credential } = await user.reauthenticateWithRedirect(provider)
-    //   // window.gapi.auth.setToken({
-    //   //   access_token: token,
-    //   //   expires_in: expirationTime,
-    //   //   error: '',
-    //   //   state: ''
-    //   // })
-    //   // const response = await window.gapi.client.drive.files.list(options)
-    //   // console.log(response)
-    //   console.log(credential)
-    // }
-    // getToken()
-  })
 
   const renderLoading = () => <label>Loading...</label>
   const renderUser = user => {
