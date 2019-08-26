@@ -6,13 +6,11 @@ import AppContext from '../contexts'
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
-  apiKey: 'AIzaSyDBB3j0qJC2af95_456Gq87kiNDyPGv6-o',
+  appId: process.env.REACT_APP_FIRE_APP_ID,
+  apiKey: process.env.REACT_APP_FIRE_API_KEY,
   authDomain: 'keepract.firebaseapp.com',
   databaseURL: 'https://keepract.firebaseio.com',
-  projectId: 'keepract',
-  storageBucket: '',
-  messagingSenderId: '512352375225',
-  appId: '1:512352375225:web:192e3f121d8b8405'
+  projectId: 'keepract'
 }
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig)
@@ -55,12 +53,19 @@ const useFirebase = () => {
 
     // listen for auth state changes
     const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
-      console.log('watch')
+      if (!user) {
+        setState({
+          initialising: false,
+          user: null
+        })
+        return
+      }
+
       if (!accessToken) {
         accessToken = await tokenStore.getItem(ACCESS_TOKEN_KEY)
       }
       // Need new access token
-      if (user && !accessToken) {
+      if (!accessToken) {
         user.reauthenticateWithRedirect(provider)
       } else {
         // TODO: Revalidate access token
@@ -70,6 +75,18 @@ const useFirebase = () => {
         //   accessToken
         // )
         // await user.reauthenticateWithCredential(credential)
+
+        // Update GAPI with new tokens
+        const idToken = await user.getIdTokenResult()
+        const expiresIn = Math.floor(
+          (Date.parse(idToken.expirationTime) - new Date().getTime()) / 1000
+        )
+        window.gapi.auth.setToken({
+          access_token: accessToken,
+          expires_in: expiresIn.toString(),
+          error: '',
+          state: ''
+        })
         setState({
           initialising: false,
           user: mapUser(user)
@@ -82,7 +99,6 @@ const useFirebase = () => {
       .auth()
       .getRedirectResult()
       .then(async result => {
-        console.log('redirect')
         if (result.credential) {
           // We need to store the result in a temp var because save to local storage is async
           // and will happen AFTER the firebase onAuthStateChanged
