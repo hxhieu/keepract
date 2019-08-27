@@ -7,7 +7,8 @@ import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import HomeIcon from '@material-ui/icons/Home'
 import { navigate } from '@reach/router'
-import { useAuthContext, login, logout } from '../hooks/auth'
+import { login, logout } from '../hooks/auth'
+import { useAuthContext } from '../contexts'
 
 const useStyles = makeStyles(theme => ({
   root: {

@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { createContext, useContext } from 'react'
 
 /**
  * The file enables `index.js` to import all contextes
@@ -15,4 +15,13 @@ files.keys().forEach(key => {
   contexts[key.replace(/(\.\/|\.js)/g, '')] = files(key).default
 })
 
-export default createContext(contexts)
+const appContext = createContext(contexts)
+
+const useAuthContext = () => {
+  const { auth } = useContext(appContext)
+  return auth
+}
+
+export { useAuthContext }
+
+export default appContext

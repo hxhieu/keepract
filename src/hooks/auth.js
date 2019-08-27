@@ -1,8 +1,7 @@
-import { useContext, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { createInstance, INDEXEDDB } from 'localforage'
 import firebase from 'firebase/app'
 import 'firebase/auth'
-import AppContext from '../contexts'
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -32,31 +31,23 @@ const mapUser = firebaseUser => {
   return { email }
 }
 
-const useAuthContext = () => {
-  const { auth } = useContext(AppContext)
-  return auth
-}
-
 const useFirebase = () => {
-  const [state, setState] = useState(() => {
-    const user = firebase.auth().currentUser
-    return {
-      initialising: !user,
-      user: mapUser(user),
-      accessToken: null
-    }
+  const [state, setState] = useState({
+    initialising: true,
+    user: null,
+    accessToken: null
   })
 
   useEffect(() => {
     // Temp value to deal with async
     let accessToken
-
     // listen for auth state changes
     const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
       if (!user) {
         setState({
           initialising: false,
-          user: null
+          user: null,
+          accessToken: null
         })
         return
       }
@@ -66,7 +57,7 @@ const useFirebase = () => {
       }
       // Need new access token
       if (!accessToken) {
-        user.reauthenticateWithRedirect(provider)
+        login()
       } else {
         // TODO: Revalidate access token
         // const idToken = await user.getIdToken()
@@ -89,7 +80,8 @@ const useFirebase = () => {
         })
         setState({
           initialising: false,
-          user: mapUser(user)
+          user: mapUser(user),
+          accessToken
         })
       }
     })
@@ -108,14 +100,14 @@ const useFirebase = () => {
       })
       .catch(error => {
         // TODO: Handle errors
-        // Handle Errors here.
-        var errorCode = error.code
-        var errorMessage = error.message
-        // The email of the user's account used.
-        var email = error.email
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential
-        // ...
+        // // Handle Errors here.
+        // var errorCode = error.code
+        // var errorMessage = error.message
+        // // The email of the user's account used.
+        // var email = error.email
+        // // The firebase.auth.AuthCredential type that was used.
+        // var credential = error.credential
+        // // ...
       })
 
     // unsubscribe to the listener when unmounting
@@ -133,4 +125,4 @@ const logout = async () => {
   firebase.auth().signOut()
 }
 
-export { useAuthContext, useFirebase, login, logout }
+export { useFirebase, login, logout }
