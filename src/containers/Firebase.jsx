@@ -125,6 +125,8 @@ export default () => {
     // unsubscribe to the listener when unmounting
     return () => unsubscribe()
   }, [dispatch])
+
+  // This component has no presenter
   return null
 }
 export { login, logout }
