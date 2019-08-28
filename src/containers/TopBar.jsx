@@ -7,8 +7,8 @@ import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import HomeIcon from '@material-ui/icons/Home'
 import { navigate } from '@reach/router'
-import { login, logout } from '../hooks/auth'
-import { useAuthContext } from '../contexts'
+import { login, logout } from './Firebase'
+import { useAuthContext } from '../contexts/auth'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -24,7 +24,8 @@ const useStyles = makeStyles(theme => ({
 
 export default () => {
   const classes = useStyles()
-  const { initialising, user } = useAuthContext()
+  const { auth } = useAuthContext()
+  const { user, initialising } = auth
 
   const gotoHome = () => {
     navigate('/')

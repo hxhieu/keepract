@@ -2,7 +2,7 @@ import React from 'react'
 import { Snackbar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { amber, green } from '@material-ui/core/colors'
-import { useAlert } from '../contexts/alert'
+import { useAlertContext } from '../contexts/alert'
 
 const useStyle = makeStyles(theme => ({
   success: {
@@ -20,7 +20,7 @@ const useStyle = makeStyles(theme => ({
 }))
 
 export default () => {
-  const { alert, dispatch } = useAlert()
+  const { alert, dispatch } = useAlertContext()
   const { type, message } = alert
   const classes = useStyle()
 

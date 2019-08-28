@@ -1,6 +1,6 @@
 export default (state, action) => {
   switch (action.type) {
-    case 'SHOW_ALERT':
+    case 'SET_AUTH':
       return {
         ...state,
         ...action.payload

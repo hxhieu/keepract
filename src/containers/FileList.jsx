@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { ListItem, ListItemText, List } from '@material-ui/core'
-import { useAuthContext } from '../contexts'
-import { logout } from '../hooks/auth'
-import { useAlert } from '../contexts/alert'
+import { logout } from './Firebase'
+import { useAlertContext } from '../contexts/alert'
+import { useAuthContext } from '../contexts/auth'
 
 export default () => {
-  const { accessToken } = useAuthContext()
+  const { auth } = useAuthContext()
+  const { accessToken } = auth
   const [files, setFiles] = useState([])
-  const { dispatch } = useAlert()
-
+  const { dispatch } = useAlertContext()
   useEffect(() => {
     if (!accessToken) {
       setFiles([])

@@ -7,9 +7,9 @@ const initialAlert = {
   message: null
 }
 
-const useAlert = () => {
+const useAlertContext = () => {
   return useContext(alertContext)
 }
 
 export default alertContext
-export { initialAlert, useAlert }
+export { initialAlert, useAlertContext }

@@ -6,10 +6,11 @@ import { createMuiTheme } from '@material-ui/core/styles'
 import Home from './pages/Home'
 import TopBar from './containers/TopBar'
 import Alert from './containers/Alert'
-import { useFirebase } from './hooks/auth'
-import AppContext from './contexts'
+import Firebase from './containers/Firebase'
 import AlertContext, { initialAlert } from './contexts/alert'
 import alertReducer from './reducers/alertReducer'
+import AuthContext, { initialAuth } from './contexts/auth'
+import authReducer from './reducers/authReducer'
 
 const theme = createMuiTheme({
   palette: {
@@ -18,17 +19,15 @@ const theme = createMuiTheme({
 })
 
 function App() {
-  const appContext = {
-    auth: useFirebase()
-  }
-
   const [alert, alertDispatch] = useReducer(alertReducer, initialAlert)
+  const [auth, authDispatch] = useReducer(authReducer, initialAuth)
 
   return (
     <AlertContext.Provider value={{ alert, dispatch: alertDispatch }}>
-      <AppContext.Provider value={appContext}>
+      <AuthContext.Provider value={{ auth, dispatch: authDispatch }}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
+          <Firebase />
           <TopBar />
           <Container maxWidth="md">
             <Router>
@@ -37,7 +36,7 @@ function App() {
           </Container>
           <Alert />
         </ThemeProvider>
-      </AppContext.Provider>
+      </AuthContext.Provider>
     </AlertContext.Provider>
   )
 }

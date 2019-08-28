@@ -1,7 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { createInstance, INDEXEDDB } from 'localforage'
 import firebase from 'firebase/app'
 import 'firebase/auth'
+import { useAuthContext } from '../contexts/auth'
+
+const ACCESS_TOKEN_KEY = 'accessToken'
+const provider = new firebase.auth.GoogleAuthProvider()
+provider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly')
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -14,9 +19,13 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig)
 
-const ACCESS_TOKEN_KEY = 'accessToken'
-const provider = new firebase.auth.GoogleAuthProvider()
-provider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly')
+const login = () => {
+  firebase.auth().signInWithRedirect(provider)
+}
+const logout = async () => {
+  await tokenStore.removeItem(ACCESS_TOKEN_KEY, null)
+  firebase.auth().signOut()
+}
 
 const tokenStore = createInstance({
   driver: INDEXEDDB,
@@ -31,12 +40,8 @@ const mapUser = firebaseUser => {
   return { email }
 }
 
-const useFirebase = () => {
-  const [state, setState] = useState({
-    initialising: true,
-    user: null,
-    accessToken: null
-  })
+export default () => {
+  const { dispatch } = useAuthContext()
 
   useEffect(() => {
     // Temp value to deal with async
@@ -44,10 +49,13 @@ const useFirebase = () => {
     // listen for auth state changes
     const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
       if (!user) {
-        setState({
-          initialising: false,
-          user: null,
-          accessToken: null
+        dispatch({
+          type: 'SET_AUTH',
+          payload: {
+            initialising: false,
+            user: null,
+            accessToken: null
+          }
         })
         return
       }
@@ -55,6 +63,7 @@ const useFirebase = () => {
       if (!accessToken) {
         accessToken = await tokenStore.getItem(ACCESS_TOKEN_KEY)
       }
+
       // Need new access token
       if (!accessToken) {
         login()
@@ -78,10 +87,13 @@ const useFirebase = () => {
           error: '',
           state: ''
         })
-        setState({
-          initialising: false,
-          user: mapUser(user),
-          accessToken
+        dispatch({
+          type: 'SET_AUTH',
+          payload: {
+            initialising: false,
+            user: mapUser(user),
+            accessToken
+          }
         })
       }
     })
@@ -112,17 +124,7 @@ const useFirebase = () => {
 
     // unsubscribe to the listener when unmounting
     return () => unsubscribe()
-  }, [])
-
-  return state
+  }, [dispatch])
+  return null
 }
-
-const login = () => {
-  firebase.auth().signInWithRedirect(provider)
-}
-const logout = async () => {
-  await tokenStore.removeItem(ACCESS_TOKEN_KEY, null)
-  firebase.auth().signOut()
-}
-
-export { useFirebase, login, logout }
+export { login, logout }
