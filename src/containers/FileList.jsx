@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from 'react'
-import { ListItem, ListItemText, List } from '@material-ui/core'
+import {
+  ListItem,
+  ListItemText,
+  List,
+  Box,
+  CircularProgress
+} from '@material-ui/core'
+import { styled } from '@material-ui/styles'
 import { logout } from './Firebase'
 import { useAlertContext } from '../contexts/alert'
 import { useAuthContext } from '../contexts/auth'
+
+const Container = styled(Box)({
+  textAlign: 'center'
+})
 
 export default () => {
   const { auth } = useAuthContext()
   const { accessToken } = auth
   const [files, setFiles] = useState([])
+  const [loading, setLoading] = useState(true)
   const { dispatch } = useAlertContext()
+
   useEffect(() => {
     if (!accessToken) {
       setFiles([])
@@ -28,6 +41,8 @@ export default () => {
         if (err.status && err.status > 400 && err.status < 500) {
           logout()
         }
+      } finally {
+        setLoading(false)
       }
     }
     fetchFiles()
@@ -45,12 +60,15 @@ export default () => {
   }
 
   return (
-    <List>
-      {files.map(({ id, name, webContentLink }) => (
-        <ListItem button key={id} onClick={() => download(webContentLink)}>
-          <ListItemText primary={name} />
-        </ListItem>
-      ))}
-    </List>
+    <Container>
+      {loading && <CircularProgress size={70} />}
+      <List>
+        {files.map(({ id, name, webContentLink }) => (
+          <ListItem button key={id} onClick={() => download(webContentLink)}>
+            <ListItemText primary={name} />
+          </ListItem>
+        ))}
+      </List>
+    </Container>
   )
 }

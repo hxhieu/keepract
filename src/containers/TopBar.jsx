@@ -1,10 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
-import IconButton from '@material-ui/core/IconButton'
+import {
+  AppBar,
+  Toolbar,
+  Hidden,
+  Typography,
+  Button,
+  CircularProgress,
+  IconButton
+} from '@material-ui/core'
 import HomeIcon from '@material-ui/icons/Home'
 import { navigate } from '@reach/router'
 import { login, logout } from './Firebase'
@@ -26,12 +30,17 @@ export default () => {
   const classes = useStyles()
   const { auth } = useAuthContext()
   const { user, initialising } = auth
+  const [loading, setLoading] = useState(false)
 
   const gotoHome = () => {
     navigate('/')
   }
+  const handleLogin = () => {
+    setLoading(true)
+    login()
+  }
 
-  const renderLoading = () => <label>Loading...</label>
+  const renderLoading = () => <CircularProgress color="secondary" />
   const renderUser = user => {
     return (
       <>
@@ -45,7 +54,7 @@ export default () => {
     )
   }
   const renderLogin = () => (
-    <Button color="inherit" onClick={login}>
+    <Button color="inherit" onClick={handleLogin}>
       Login
     </Button>
   )
@@ -63,10 +72,12 @@ export default () => {
           >
             <HomeIcon />
           </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            Keepract
-          </Typography>
-          {initialising
+          <Hidden smDown>
+            <Typography variant="h6" className={classes.title}>
+              Keepract
+            </Typography>
+          </Hidden>
+          {initialising || loading
             ? renderLoading()
             : user
             ? renderUser(user)
