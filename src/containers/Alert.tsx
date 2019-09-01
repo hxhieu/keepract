@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Snackbar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { amber, green } from '@material-ui/core/colors'
@@ -22,7 +22,25 @@ const useStyle = makeStyles(theme => ({
 export default () => {
   const { alert, dispatch } = useAlertContext()
   const { type, message } = alert
-  const classes = useStyle()
+  const [alertClass, setAlertClasss] = useState('info')
+  const { success, warning, error, info } = useStyle()
+
+  // useEffect(() => {
+  //   switch (type) {
+  //     case 'success':
+  //       setAlertClasss(success)
+  //       break
+  //     case 'warning':
+  //       setAlertClasss(warning)
+  //       break
+  //     case 'error':
+  //       setAlertClasss(error)
+  //       break
+  //     case 'info':
+  //       setAlertClasss(info)
+  //       break
+  //   }
+  // }, [error, info, success, type, warning])
 
   function close() {
     dispatch({
@@ -40,7 +58,7 @@ export default () => {
         vertical: 'top',
         horizontal: 'center'
       }}
-      className={classes[type]}
+      className={alertClass}
       open={!!type}
       message={<span>{message}</span>}
       onClose={close}

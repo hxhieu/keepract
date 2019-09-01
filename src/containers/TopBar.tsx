@@ -12,7 +12,7 @@ import {
 import HomeIcon from '@material-ui/icons/Home'
 import { navigate } from '@reach/router'
 import { login, logout } from './Firebase'
-import { useAuthContext } from '../contexts/auth'
+import { useAuthContext, IAuthUser } from '../contexts/auth'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -41,7 +41,7 @@ export default () => {
   }
 
   const renderLoading = () => <CircularProgress color="secondary" />
-  const renderUser = user => {
+  const renderUser = (user: IAuthUser) => {
     return (
       <>
         <Typography variant="body1" className={classes.title}>
@@ -72,7 +72,7 @@ export default () => {
           >
             <HomeIcon />
           </IconButton>
-          <Hidden smDown>
+          <Hidden xsDown>
             <Typography variant="h6" className={classes.title}>
               Keepract
             </Typography>

@@ -11,6 +11,7 @@ import AlertContext, { initialAlert } from './contexts/alert'
 import alertReducer from './reducers/alertReducer'
 import AuthContext, { initialAuth } from './contexts/auth'
 import authReducer from './reducers/authReducer'
+import { RouterPage } from './RouterPage'
 
 const theme = createMuiTheme({
   palette: {
@@ -31,7 +32,7 @@ function App() {
           <TopBar />
           <Container maxWidth="md">
             <Router>
-              <Home path="/" />
+              <RouterPage path="/" pageComponent={<Home />} />
             </Router>
           </Container>
           <Alert />

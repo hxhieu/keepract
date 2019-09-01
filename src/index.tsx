@@ -4,9 +4,9 @@ import App from './App'
 import * as serviceWorker from './serviceWorker'
 
 // Load GAPI first
-window.gapi.load('client', async () => {
+gapi.load('client', async () => {
   // Load more GAPI clients
-  await window.gapi.client.load('drive', 'v3')
+  await gapi.client.load('drive', 'v3')
   ReactDOM.render(<App />, document.getElementById('root'))
 })
 

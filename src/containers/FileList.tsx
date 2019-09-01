@@ -18,8 +18,8 @@ const Container = styled(Box)({
 export default () => {
   const { auth } = useAuthContext()
   const { accessToken } = auth
-  const [files, setFiles] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [files, setFiles] = useState([] as gapi.client.drive.File[])
+  const [loading, setLoading] = useState(false)
   const { dispatch } = useAlertContext()
 
   useEffect(() => {
@@ -34,12 +34,13 @@ export default () => {
     }
     const fetchFiles = async () => {
       try {
-        const response = await window.gapi.client.drive.files.list(options)
-        setFiles(response.result.files || [])
+        setLoading(true)
+        const response = await gapi.client.drive.files.list(options)
+        setFiles(response.result.files || ([] as gapi.client.drive.File[]))
       } catch (err) {
         // Token expired
         if (err.status && err.status > 400 && err.status < 500) {
-          logout()
+          // logout()
         }
       } finally {
         setLoading(false)
@@ -48,7 +49,7 @@ export default () => {
     fetchFiles()
   }, [accessToken])
 
-  const download = link => {
+  const download = (link: string | undefined) => {
     dispatch({
       type: 'SHOW_ALERT',
       payload: {

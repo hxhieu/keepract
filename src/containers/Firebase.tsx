@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { createInstance, INDEXEDDB } from 'localforage'
-import firebase from 'firebase/app'
+import firebase, { User, auth } from 'firebase/app'
 import 'firebase/auth'
 import { useAuthContext } from '../contexts/auth'
 
@@ -23,7 +23,7 @@ const login = () => {
   firebase.auth().signInWithRedirect(provider)
 }
 const logout = async () => {
-  await tokenStore.removeItem(ACCESS_TOKEN_KEY, null)
+  await tokenStore.removeItem(ACCESS_TOKEN_KEY, undefined)
   firebase.auth().signOut()
 }
 
@@ -34,7 +34,7 @@ const tokenStore = createInstance({
   storeName: 'token_store'
 })
 
-const mapUser = firebaseUser => {
+const mapUser = (firebaseUser: User) => {
   if (!firebaseUser) return null
   const { email } = firebaseUser
   return { email }
@@ -45,7 +45,8 @@ export default () => {
 
   useEffect(() => {
     // Temp value to deal with async
-    let accessToken
+    let accessToken: string = ''
+    console.log(accessToken)
     // listen for auth state changes
     const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
       if (!user) {
@@ -81,7 +82,7 @@ export default () => {
         const expiresIn = Math.floor(
           (Date.parse(idToken.expirationTime) - new Date().getTime()) / 1000
         )
-        window.gapi.auth.setToken({
+        gapi.auth.setToken({
           access_token: accessToken,
           expires_in: expiresIn.toString(),
           error: '',
@@ -103,10 +104,12 @@ export default () => {
       .auth()
       .getRedirectResult()
       .then(async result => {
+        console.log('re')
         if (result.credential) {
           // We need to store the result in a temp var because save to local storage is async
           // and will happen AFTER the firebase onAuthStateChanged
-          accessToken = result.credential.accessToken
+          accessToken = (result.credential as auth.OAuthCredential)
+            .accessToken as string
           await tokenStore.setItem(ACCESS_TOKEN_KEY, accessToken)
         }
       })
