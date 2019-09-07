@@ -18,16 +18,15 @@ const EmptyText = styled.label(
   })
 )
 
-export default () => {
+export default ({ onCreate }: { onCreate: () => void }) => {
   const {
     palette: { text }
   } = useTheme()
-  console.log(text)
   return (
     <Container>
       <InboxIcon fontSize="large" color="disabled"></InboxIcon>
       <EmptyText color={text.disabled}>You have no Project</EmptyText>
-      <Button variant="contained" color="primary">
+      <Button variant="contained" color="primary" onClick={onCreate}>
         Create one now!
       </Button>
     </Container>

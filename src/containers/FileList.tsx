@@ -6,8 +6,7 @@ import {
   Box,
   CircularProgress
 } from '@material-ui/core'
-import { styled } from '@material-ui/styles'
-import { logout } from './Firebase'
+import styled from '@emotion/styled'
 import { useAlertContext } from '../contexts/alert'
 import { useAuthContext } from '../contexts/auth'
 
