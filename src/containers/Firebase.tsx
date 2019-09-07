@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
-import { createInstance, INDEXEDDB } from 'localforage'
 import firebase, { User, auth } from 'firebase/app'
 import 'firebase/auth'
 import { useAuthContext } from '../contexts/auth'
+import { getStorage } from '../storage'
 
 const ACCESS_TOKEN_KEY = 'accessToken'
 const provider = new firebase.auth.GoogleAuthProvider()
@@ -23,16 +23,9 @@ const login = () => {
   firebase.auth().signInWithRedirect(provider)
 }
 const logout = async () => {
-  await tokenStore.removeItem(ACCESS_TOKEN_KEY, undefined)
+  await getStorage('token').removeItem(ACCESS_TOKEN_KEY, undefined)
   firebase.auth().signOut()
 }
-
-const tokenStore = createInstance({
-  driver: INDEXEDDB,
-  name: 'keepract',
-  version: 1.0,
-  storeName: 'token_store'
-})
 
 const mapUser = (firebaseUser: User) => {
   if (!firebaseUser) return null
@@ -42,6 +35,7 @@ const mapUser = (firebaseUser: User) => {
 
 export default () => {
   const { dispatch } = useAuthContext()
+  const tokenStore = getStorage('token')
 
   useEffect(() => {
     // Temp value to deal with async
