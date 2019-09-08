@@ -24,7 +24,7 @@ export default () => {
       setLoading(false)
     }
     loadProjects()
-  }, [])
+  }, [storage])
 
   function createProject(values: IProject) {
     console.log(values)

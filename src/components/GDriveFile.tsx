@@ -7,19 +7,26 @@ import {
   CircularProgress
 } from '@material-ui/core'
 import styled from '@emotion/styled'
-import { useAlertContext } from '../contexts/alert'
 import { useAuthContext } from '../contexts/auth'
 
 const Container = styled(Box)({
   textAlign: 'center'
 })
 
-export default () => {
+const Loader = styled(CircularProgress)`
+  margin-top: 20px;
+`
+
+export default ({
+  onSelect
+}: {
+  onSelect: (name: string | undefined, url: string | undefined) => void
+}) => {
   const { auth } = useAuthContext()
   const { accessToken } = auth
   const [files, setFiles] = useState([] as gapi.client.drive.File[])
   const [loading, setLoading] = useState(false)
-  const { dispatch } = useAlertContext()
+  const [error, setError] = useState('')
 
   useEffect(() => {
     if (!accessToken) {
@@ -39,7 +46,7 @@ export default () => {
       } catch (err) {
         // Token expired
         if (err.status && err.status > 400 && err.status < 500) {
-          // logout()
+          setError('Your token is expired, please relog')
         }
       } finally {
         setLoading(false)
@@ -48,27 +55,24 @@ export default () => {
     fetchFiles()
   }, [accessToken])
 
-  const download = (link: string | undefined) => {
-    dispatch({
-      type: 'SHOW_ALERT',
-      payload: {
-        type: 'success',
-        message: 'Hello!'
-      }
-    })
-    console.log(link)
-  }
-
   return (
     <Container>
-      {loading && <CircularProgress size={70} />}
-      <List>
-        {files.map(({ id, name, webContentLink }) => (
-          <ListItem button key={id} onClick={() => download(webContentLink)}>
-            <ListItemText primary={name} />
-          </ListItem>
-        ))}
-      </List>
+      {loading && <Loader size={70} />}
+      {error ? (
+        error
+      ) : (
+        <List>
+          {files.map(({ id, name, webContentLink }) => (
+            <ListItem
+              button
+              key={id}
+              onClick={() => onSelect(name, webContentLink)}
+            >
+              <ListItemText primary={name} />
+            </ListItem>
+          ))}
+        </List>
+      )}
     </Container>
   )
 }

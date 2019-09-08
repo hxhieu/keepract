@@ -1,29 +1,29 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Snackbar } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import { amber, green } from '@material-ui/core/colors'
+// import { makeStyles } from '@material-ui/core/styles'
+// import { amber, green } from '@material-ui/core/colors'
 import { useAlertContext } from '../contexts/alert'
 
-const useStyle = makeStyles(theme => ({
-  success: {
-    color: green[600]
-  },
-  error: {
-    color: theme.palette.error.dark
-  },
-  info: {
-    color: theme.palette.primary.main
-  },
-  warning: {
-    color: amber[700]
-  }
-}))
+// const useStyle = makeStyles(theme => ({
+//   success: {
+//     color: green[600]
+//   },
+//   error: {
+//     color: theme.palette.error.dark
+//   },
+//   info: {
+//     color: theme.palette.primary.main
+//   },
+//   warning: {
+//     color: amber[700]
+//   }
+// }))
 
 export default () => {
   const { alert, dispatch } = useAlertContext()
   const { type, message } = alert
-  const [alertClass, setAlertClasss] = useState('info')
-  const { success, warning, error, info } = useStyle()
+  const [alertClass] = useState('info')
+  // const { success, warning, error, info } = useStyle()
 
   // useEffect(() => {
   //   switch (type) {
