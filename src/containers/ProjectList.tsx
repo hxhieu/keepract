@@ -5,6 +5,7 @@ import PageHeader from '../styled/PageHeader'
 import ProjectEmpty from '../components/ProjectEmpty'
 import ProjectForm from '../components/ProjectForm'
 import { getStorage } from '../storage'
+import { IProject } from '../types'
 
 const Loader = styled.div({
   textAlign: 'center'
@@ -13,6 +14,7 @@ const Loader = styled.div({
 export default () => {
   const storage = getStorage('project')
   const [projects, setProjects] = useState([])
+  const [project, setProject] = useState(undefined)
   const [loading, setLoading] = useState(true)
   const [openProjectCreate, setOpenProjectCreate] = useState(false)
 
@@ -24,7 +26,8 @@ export default () => {
     loadProjects()
   }, [])
 
-  function createProject() {
+  function createProject(values: IProject) {
+    console.log(values)
     setOpenProjectCreate(false)
   }
 
@@ -43,7 +46,7 @@ export default () => {
             onCreate={() => setOpenProjectCreate(true)}
           ></ProjectEmpty>
           <ProjectForm
-            project={undefined}
+            project={project}
             open={openProjectCreate}
             onClose={() => setOpenProjectCreate(false)}
             onSave={createProject}
