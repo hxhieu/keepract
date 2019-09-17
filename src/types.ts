@@ -8,4 +8,7 @@ export interface IProject {
   uuid: string
   kdbxName?: string
   kdbxUrl?: string
+  credType?: string
+  password?: string
+  keyFile?: string
 }

@@ -9,7 +9,13 @@ import {
   Typography,
   InputAdornment,
   Box,
-  Button
+  Button,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormControl,
+  FormLabel,
+  Input
 } from '@material-ui/core'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
 import CloseIcon from '@material-ui/icons/Close'
@@ -18,9 +24,11 @@ import SubjectIcon from '@material-ui/icons/Subject'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import DownloadIcon from '@material-ui/icons/GetApp'
 import StorageIcon from '@material-ui/icons/Storage'
-import { IProject } from '../types'
+import KeyIcon from '@material-ui/icons/VpnKey'
+import * as ab2str from 'arraybuffer-to-string'
 import { v4 } from 'uuid'
 import GDriveFile from './GDriveFile'
+import { IProject } from '../types'
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -37,8 +45,18 @@ const useStyles = makeStyles(theme => ({
     }
   },
   actions: {
+    marginTop: '10px',
     display: 'flex',
     justifyContent: 'flex-end'
+  },
+  credType: {
+    flexDirection: 'row'
+  },
+  formControl: {
+    margin: '16px 0 8px'
+  },
+  formLabel: {
+    fontSize: '12px'
   }
 }))
 
@@ -58,7 +76,10 @@ export default ({
     uuid: '',
     name: '',
     kdbxUrl: '',
-    kdbxName: ''
+    kdbxName: '',
+    credType: '',
+    password: '',
+    keyFile: ''
   })
   const [openFile, setOpenFile] = useState(false)
   const [url, setUrl] = useState('')
@@ -66,17 +87,33 @@ export default ({
   useEffect(() => {
     // Clear values on close
     setValues({
-      uuid: open ? (project ? project.uuid : v4()) : '',
-      name: open ? (project ? project.name : '') : '',
-      kdbxUrl: open ? (project ? project.kdbxUrl || '' : '') : '',
-      kdbxName: open ? (project ? project.kdbxName || '' : '') : ''
+      uuid: open ? (project && project.uuid) || v4() : '',
+      name: open ? (project && project.name) || '' : '',
+      kdbxUrl: open ? (project && project.kdbxUrl) || '' : '',
+      kdbxName: open ? (project && project.kdbxName) || '' : '',
+      credType: open ? (project && project.credType) || 'not-set' : '',
+      password: open ? (project && project.password) || '' : '',
+      keyFile: open ? (project && project.keyFile) || '' : ''
     })
   }, [open, project])
 
   function onChange(key: string, evt: any | string) {
     let value = ''
     if (typeof evt === 'object') {
-      value = evt.target.value
+      // File upload
+      if (evt.target.files) {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          value = ab2str(reader.result, 'hex')
+          setValues({
+            ...values,
+            [key]: value
+          })
+        }
+        reader.readAsArrayBuffer(evt.target.files[0])
+      } else {
+        value = evt.target.value
+      }
     } else {
       value = evt
     }
@@ -177,6 +214,63 @@ export default ({
                 )
               }}
             />
+            <FormControl className={classes.formControl} fullWidth>
+              <FormLabel className={classes.formLabel}>
+                Credentials Type
+              </FormLabel>
+              <RadioGroup
+                aria-label="cred-type"
+                className={classes.credType}
+                name="credType"
+                value={values.credType}
+                onChange={evt => onChange('credType', evt)}
+              >
+                <FormControlLabel
+                  value="not-set"
+                  control={<Radio />}
+                  label="Set Later"
+                />
+                <FormControlLabel
+                  value="key-file"
+                  control={<Radio />}
+                  label="Key File"
+                />
+                <FormControlLabel
+                  value="password"
+                  control={<Radio />}
+                  label="Password"
+                />
+              </RadioGroup>
+            </FormControl>
+            {values.credType === 'key-file' && (
+              <FormControl className={classes.formControl} fullWidth>
+                <FormLabel className={classes.formLabel}>Key File</FormLabel>
+                <Input
+                  fullWidth
+                  type="file"
+                  onChange={evt => onChange('keyFile', evt)}
+                ></Input>
+              </FormControl>
+            )}
+            {values.credType === 'password' && (
+              <TextValidator
+                value={values.password}
+                type="password"
+                onChange={evt => onChange('password', evt)}
+                errorMessages={['This field is required']}
+                fullWidth
+                label="Password"
+                name="password"
+                margin="normal"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <KeyIcon />
+                    </InputAdornment>
+                  )
+                }}
+              />
+            )}
             <Box className={classes.actions}>
               <Button variant="contained" color="primary" type="submit">
                 Save
@@ -185,6 +279,8 @@ export default ({
           </ValidatorForm>
         </Container>
       </Dialog>
+
+      {/* GDrive dialog */}
       <Dialog open={openFile} fullWidth maxWidth="sm">
         <AppBar className={classes.appBar}>
           <Toolbar>
