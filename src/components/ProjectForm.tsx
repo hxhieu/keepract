@@ -91,7 +91,7 @@ export default ({
       name: open ? (project && project.name) || '' : '',
       kdbxUrl: open ? (project && project.kdbxUrl) || '' : '',
       kdbxName: open ? (project && project.kdbxName) || '' : '',
-      credType: open ? (project && project.credType) || 'not-set' : '',
+      credType: open ? (project && project.credType) || '' : '',
       password: open ? (project && project.password) || '' : '',
       keyFile: open ? (project && project.keyFile) || '' : ''
     })
@@ -226,7 +226,7 @@ export default ({
                 onChange={evt => onChange('credType', evt)}
               >
                 <FormControlLabel
-                  value="not-set"
+                  value=""
                   control={<Radio />}
                   label="Set Later"
                 />

@@ -3,9 +3,15 @@ import {
   CircularProgress,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
-  Button
+  ListItemSecondaryAction,
+  IconButton,
+  Button,
+  Chip
 } from '@material-ui/core'
+import EditIcon from '@material-ui/icons/Edit'
+import StorageIcon from '@material-ui/icons/Storage'
 import styled from '@emotion/styled'
 import PageHeader from '../styled/PageHeader'
 import ProjectEmpty from '../components/ProjectEmpty'
@@ -99,7 +105,29 @@ export default () => {
         <List>
           {list.map(x => (
             <ListItem button key={x.uuid}>
-              <ListItemText primary={x.name} onClick={() => editProject(x)} />
+              <ListItemIcon>
+                <StorageIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={x.name}
+                secondary={
+                  x.credType ? (
+                    'Click to open'
+                  ) : (
+                    <Chip component="a" label="LOCKED" size="small"></Chip>
+                  )
+                }
+              />
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end"
+                  color="primary"
+                  aria-label="delete"
+                  onClick={() => editProject(x)}
+                >
+                  <EditIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>

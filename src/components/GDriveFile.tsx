@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react'
 import {
   ListItem,
   ListItemText,
+  ListItemIcon,
   List,
   Box,
   CircularProgress
 } from '@material-ui/core'
+import StorageIcon from '@material-ui/icons/Storage'
 import styled from '@emotion/styled'
 import { useAuthContext } from '../contexts/auth'
 
@@ -73,6 +75,9 @@ export default ({
               key={id}
               onClick={() => onSelect(name, webContentLink)}
             >
+              <ListItemIcon>
+                <StorageIcon />
+              </ListItemIcon>
               <ListItemText primary={name} />
             </ListItem>
           ))}
