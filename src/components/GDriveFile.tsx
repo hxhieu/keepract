@@ -17,6 +17,11 @@ const Loader = styled(CircularProgress)`
   margin-top: 20px;
 `
 
+const ErrorMessage = styled.label({
+  display: 'block',
+  margin: '20px'
+})
+
 export default ({
   onSelect
 }: {
@@ -59,7 +64,7 @@ export default ({
     <Container>
       {loading && <Loader size={70} />}
       {error ? (
-        error
+        <ErrorMessage>{error}</ErrorMessage>
       ) : (
         <List>
           {files.map(({ id, name, webContentLink }) => (

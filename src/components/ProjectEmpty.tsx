@@ -2,7 +2,6 @@ import React from 'react'
 import InboxIcon from '@material-ui/icons/Inbox'
 import styled from '@emotion/styled'
 import { useTheme } from '@material-ui/styles'
-import { Button } from '@material-ui/core'
 
 const Container = styled.div({
   textAlign: 'center'
@@ -18,7 +17,7 @@ const EmptyText = styled.label(
   })
 )
 
-export default ({ onCreate }: { onCreate: () => void }) => {
+export default () => {
   const {
     palette: { text }
   } = useTheme()
@@ -26,9 +25,6 @@ export default ({ onCreate }: { onCreate: () => void }) => {
     <Container>
       <InboxIcon fontSize="large" color="disabled"></InboxIcon>
       <EmptyText color={text.disabled}>You have no Project</EmptyText>
-      <Button variant="contained" color="primary" onClick={onCreate}>
-        Create one now!
-      </Button>
     </Container>
   )
 }
