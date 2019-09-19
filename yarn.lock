@@ -1614,6 +1614,11 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.3.tgz#bdfd69d61e464dcc81b25159c270d75a73c1a636"
   integrity sha512-Il2DtDVRGDcqjDtE+rF8iqg1CArehSK84HZJCT7AMITlyXRBpuPhqGLDQMowraqqu1coEaimg4ZOqggt6L6L+A==
 
+"@types/kdbxweb@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@types/kdbxweb/-/kdbxweb-1.2.0.tgz#7240b9d1eb98fa9b3c26a6f92d60eeba1f342813"
+  integrity sha512-K91suisHO87+/NGe/4kQX9DXpUr/MVIIuqG/WSHHRyEnwJj6zeRrvK83mlskFg4DK7IBN2OhD3GwNAkH9zYXpA==
+
 "@types/long@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-4.0.0.tgz#719551d2352d301ac8b81db732acb6bdc28dbdef"
@@ -6482,6 +6487,15 @@ jsx-ast-utils@^2.1.0, jsx-ast-utils@^2.2.1:
     array-includes "^3.0.3"
     object.assign "^4.1.0"
 
+kdbxweb@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/kdbxweb/-/kdbxweb-1.4.2.tgz#16bacaf2440dd2774cffc4c4332a966e7f0ac6dc"
+  integrity sha512-K7e+jjLqp2sRmUcq3EKooI6/Y1zb9G9ztWnkURhtbAUiXjerlFnrq9kA3hzQAsJ2R8j6Z5+nHWnsXAhhfmyr1Q==
+  dependencies:
+    pako "github:keeweb/pako#653c0b00d8941c89d09ed4546d2179001ec44efc"
+    text-encoding "github:keeweb/text-encoding#4dfb7cb0954c222852092f8b06ae4f6b4f60bfbb"
+    xmldom "github:keeweb/xmldom#ec8f61f723e2f403adaf7a1bbf55ced4ff1ea0c6"
+
 killable@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"
@@ -7612,6 +7626,10 @@ p-try@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
+
+"pako@github:keeweb/pako#653c0b00d8941c89d09ed4546d2179001ec44efc":
+  version "1.0.3"
+  resolved "https://codeload.github.com/keeweb/pako/tar.gz/653c0b00d8941c89d09ed4546d2179001ec44efc"
 
 pako@~1.0.5:
   version "1.0.10"
@@ -10093,6 +10111,10 @@ test-exclude@^5.2.3:
     read-pkg-up "^4.0.0"
     require-main-filename "^2.0.0"
 
+"text-encoding@github:keeweb/text-encoding#4dfb7cb0954c222852092f8b06ae4f6b4f60bfbb":
+  version "0.6.0"
+  resolved "https://codeload.github.com/keeweb/text-encoding/tar.gz/4dfb7cb0954c222852092f8b06ae4f6b4f60bfbb"
+
 text-table@0.2.0, text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
@@ -10971,6 +10993,10 @@ xmlchars@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/xmlchars/-/xmlchars-2.1.1.tgz#ef1a81c05bff629c2280007f12daca21bd6f6c93"
   integrity sha512-7hew1RPJ1iIuje/Y01bGD/mXokXxegAgVS+e+E0wSi2ILHQkYAH1+JXARwTjZSM4Z4Z+c73aKspEcqj+zPPL/w==
+
+"xmldom@github:keeweb/xmldom#ec8f61f723e2f403adaf7a1bbf55ced4ff1ea0c6":
+  version "0.1.21"
+  resolved "https://codeload.github.com/keeweb/xmldom/tar.gz/ec8f61f723e2f403adaf7a1bbf55ced4ff1ea0c6"
 
 xmlhttprequest@1.8.0:
   version "1.8.0"

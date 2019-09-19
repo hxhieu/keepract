@@ -16,6 +16,7 @@ import styled from '@emotion/styled'
 import PageHeader from '../styled/PageHeader'
 import ProjectEmpty from '../components/ProjectEmpty'
 import ProjectForm from '../components/ProjectForm'
+import ProjectDatabase from '../components/ProjectDatabase'
 import { getStorage } from '../storage'
 import { IProject } from '../types'
 
@@ -27,6 +28,11 @@ interface IProjectForm {
 interface IProjectList {
   list: IProject[]
   loading: boolean
+}
+
+interface IProjectDatabase {
+  project: IProject
+  open: boolean
 }
 
 const Loader = styled.div({
@@ -45,6 +51,13 @@ export default () => {
   })
   const [projectForm, setProjectForm] = useState<IProjectForm>({
     project: undefined,
+    open: false
+  })
+  const [projectDatabase, setProjectDatabase] = useState<IProjectDatabase>({
+    project: {
+      name: '',
+      uuid: ''
+    },
     open: false
   })
 
@@ -91,8 +104,21 @@ export default () => {
     })
   }
 
+  function loadProject(project: IProject) {
+    if (!project.credType) {
+      setProjectForm({
+        project,
+        open: true
+      })
+    } else {
+      setProjectDatabase({
+        project,
+        open: true
+      })
+    }
+  }
+
   const { loading, list } = projects
-  const { project, open } = projectForm
 
   return (
     <>
@@ -104,17 +130,17 @@ export default () => {
       ) : list.length ? (
         <List>
           {list.map(x => (
-            <ListItem button key={x.uuid}>
+            <ListItem button key={x.uuid} onClick={() => loadProject(x)}>
               <ListItemIcon>
                 <StorageIcon />
               </ListItemIcon>
               <ListItemText
                 primary={x.name}
                 secondary={
-                  x.credType ? (
-                    'Click to open'
-                  ) : (
+                  !x.credType ? (
                     <Chip component="a" label="LOCKED" size="small"></Chip>
+                  ) : (
+                    'Click to open'
                   )
                 }
               />
@@ -149,8 +175,8 @@ export default () => {
         </Button>
       </Buttons>
       <ProjectForm
-        project={project}
-        open={open}
+        project={projectForm.project}
+        open={projectForm.open}
         onClose={() =>
           setProjectForm({
             ...projectForm,
@@ -159,6 +185,16 @@ export default () => {
         }
         onSave={saveProject}
       ></ProjectForm>
+      <ProjectDatabase
+        project={projectDatabase.project}
+        open={projectDatabase.open}
+        onClose={() =>
+          setProjectDatabase({
+            ...projectDatabase,
+            open: false
+          })
+        }
+      ></ProjectDatabase>
     </>
   )
 }

@@ -6,7 +6,8 @@ import { getStorage } from '../storage'
 
 const ACCESS_TOKEN_KEY = 'accessToken'
 const provider = new firebase.auth.GoogleAuthProvider()
-provider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly')
+// TODO: Restricted scope
+provider.addScope('https://www.googleapis.com/auth/drive.readonly')
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -40,7 +41,6 @@ export default () => {
   useEffect(() => {
     // Temp value to deal with async
     let accessToken: string = ''
-    console.log(accessToken)
     // listen for auth state changes
     const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
       if (!user) {
@@ -98,7 +98,6 @@ export default () => {
       .auth()
       .getRedirectResult()
       .then(async result => {
-        console.log('re')
         if (result.credential) {
           // We need to store the result in a temp var because save to local storage is async
           // and will happen AFTER the firebase onAuthStateChanged

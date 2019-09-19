@@ -75,21 +75,21 @@ export default ({
   const [values, setValues] = useState({
     uuid: '',
     name: '',
-    kdbxUrl: '',
+    kdbxFileId: '',
     kdbxName: '',
     credType: '',
     password: '',
     keyFile: ''
   })
   const [openFile, setOpenFile] = useState(false)
-  const [url, setUrl] = useState('')
+  const [fileId, setFileId] = useState('')
 
   useEffect(() => {
     // Clear values on close
     setValues({
       uuid: open ? (project && project.uuid) || v4() : '',
       name: open ? (project && project.name) || '' : '',
-      kdbxUrl: open ? (project && project.kdbxUrl) || '' : '',
+      kdbxFileId: open ? (project && project.kdbxFileId) || '' : '',
       kdbxName: open ? (project && project.kdbxName) || '' : '',
       credType: open ? (project && project.credType) || '' : '',
       password: open ? (project && project.password) || '' : '',
@@ -145,7 +145,9 @@ export default ({
           </Toolbar>
         </AppBar>
         <Container maxWidth="md">
-          <ValidatorForm onSubmit={() => onSave({ ...values, kdbxUrl: url })}>
+          <ValidatorForm
+            onSubmit={() => onSave({ ...values, kdbxFileId: fileId })}
+          >
             <TextValidator
               value={values.uuid}
               validators={['required']}
@@ -190,7 +192,7 @@ export default ({
             />
             <TextValidator
               value={values.kdbxName}
-              onChange={evt => onChange('kdbxUrl', evt)}
+              onChange={evt => onChange('kdbxFileId', evt)}
               validators={['required']}
               errorMessages={['This field is required']}
               fullWidth
@@ -298,10 +300,10 @@ export default ({
           </Toolbar>
         </AppBar>
         <GDriveFile
-          onSelect={(name: string | undefined, url: string | undefined) => {
+          onSelect={(name: string, id: string) => {
             onChange('kdbxName', name)
             // Dont know why but need separate state and cannot call onChange() twice
-            setUrl(url || '')
+            setFileId(id || '')
           }}
         />
       </Dialog>
