@@ -28,7 +28,7 @@ import KeyIcon from '@material-ui/icons/VpnKey'
 import * as str2ab from 'string-to-arraybuffer'
 import { v4 } from 'uuid'
 import { IProject } from '../types'
-import { Credentials, ProtectedValue, Kdbx } from 'kdbxweb'
+import { Credentials, Kdbx } from 'kdbxweb'
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -80,10 +80,11 @@ export default ({
         fileId,
         alt: 'media'
       })
+
       const db = str2ab(response.body)
       const key = str2ab(project.keyFile)
 
-      const cred = new Credentials(ProtectedValue.fromString(''), key)
+      const cred = new Credentials(null, key)
       Kdbx.load(db, cred)
         .then(test => {
           console.log(test.meta)
@@ -91,14 +92,6 @@ export default ({
         .catch(err => console.log(err))
     }
     fetchFile()
-
-    // request
-    //   .on('end', function() {
-    //     console.log('Done')
-    //   })
-    //   .on('error', (err: any) => {
-    //     console.log('Error during download', err)
-    //   })
   }, [project])
 
   return (

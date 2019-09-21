@@ -27,7 +27,7 @@ const ErrorMessage = styled.label({
 export default ({
   onSelect
 }: {
-  onSelect: (name: string, id: string) => void
+  onSelect: (name: string, id: string, url?: string) => void
 }) => {
   const { auth } = useAuthContext()
   const { accessToken } = auth
@@ -69,11 +69,11 @@ export default ({
         <ErrorMessage>{error}</ErrorMessage>
       ) : (
         <List>
-          {files.map(({ id, name }) => (
+          {files.map(({ id, name, webContentLink }) => (
             <ListItem
               button
               key={id}
-              onClick={() => onSelect(name || '', id || '')}
+              onClick={() => onSelect(name || '', id || '', webContentLink)}
             >
               <ListItemIcon>
                 <StorageIcon />

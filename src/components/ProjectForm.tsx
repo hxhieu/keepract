@@ -104,7 +104,7 @@ export default ({
       if (evt.target.files) {
         const reader = new FileReader()
         reader.onloadend = () => {
-          value = ab2str(reader.result, 'hex')
+          value = ab2str(reader.result)
           setValues({
             ...values,
             [key]: value
@@ -300,7 +300,7 @@ export default ({
           </Toolbar>
         </AppBar>
         <GDriveFile
-          onSelect={(name: string, id: string) => {
+          onSelect={(name: string, id: string, url?: string) => {
             onChange('kdbxName', name)
             // Dont know why but need separate state and cannot call onChange() twice
             setFileId(id || '')
