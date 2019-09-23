@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import {
-  CircularProgress,
   List,
   ListItem,
   ListItemIcon,
@@ -14,6 +13,7 @@ import EditIcon from '@material-ui/icons/Edit'
 import StorageIcon from '@material-ui/icons/Storage'
 import styled from '@emotion/styled'
 import PageHeader from '../styled/PageHeader'
+import ScreenLoader from '../components/ScreenLoader'
 import ProjectEmpty from '../components/ProjectEmpty'
 import ProjectForm from '../components/ProjectForm'
 import ProjectDatabase from '../components/ProjectDatabase'
@@ -34,10 +34,6 @@ interface IProjectDatabase {
   project: IProject
   open: boolean
 }
-
-const Loader = styled.div({
-  textAlign: 'center'
-})
 
 const Buttons = styled.div({
   textAlign: 'center'
@@ -123,11 +119,8 @@ export default () => {
   return (
     <>
       <PageHeader>Projects</PageHeader>
-      {loading ? (
-        <Loader>
-          <CircularProgress size={70} />
-        </Loader>
-      ) : list.length ? (
+      <ScreenLoader loading={loading} />
+      {list.length ? (
         <List>
           {list.map(x => (
             <ListItem button key={x.uuid} onClick={() => loadProject(x)}>
