@@ -38,7 +38,8 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(2),
     flex: 1
   },
-  idRefresh: {
+  clickable: {
+    color: '#aaa',
     cursor: 'pointer',
     '&:hover': {
       color: '#fff'
@@ -166,7 +167,7 @@ export default ({
                 endAdornment: !project && (
                   <InputAdornment position="start">
                     <RefreshIcon
-                      className={classes.idRefresh}
+                      className={classes.clickable}
                       onClick={() => onChange('uuid', v4())}
                     />
                   </InputAdornment>
@@ -209,7 +210,7 @@ export default ({
                 endAdornment: (
                   <InputAdornment position="start">
                     <DownloadIcon
-                      className={classes.idRefresh}
+                      className={classes.clickable}
                       onClick={() => setOpenFile(true)}
                     />
                   </InputAdornment>

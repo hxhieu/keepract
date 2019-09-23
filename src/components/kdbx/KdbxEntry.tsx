@@ -3,11 +3,17 @@ import KeyIcon from '@material-ui/icons/VpnKey'
 import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
 import { Entry } from 'kdbxweb'
 
-export default ({ entry }: { entry: Entry }) => {
+export default ({
+  entry,
+  onSelect
+}: {
+  entry: Entry
+  onSelect: (entry: Entry) => void
+}) => {
   const { fields } = entry
   const { Title } = fields
   return (
-    <ListItem button>
+    <ListItem button onClick={() => onSelect(entry)}>
       <ListItemIcon>
         <KeyIcon />
       </ListItemIcon>

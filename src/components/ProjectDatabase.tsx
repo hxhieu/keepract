@@ -27,26 +27,6 @@ const useStyles = makeStyles(theme => ({
   title: {
     marginLeft: theme.spacing(2),
     flex: 1
-  },
-  idRefresh: {
-    cursor: 'pointer',
-    '&:hover': {
-      color: '#fff'
-    }
-  },
-  actions: {
-    marginTop: '10px',
-    display: 'flex',
-    justifyContent: 'flex-end'
-  },
-  credType: {
-    flexDirection: 'row'
-  },
-  formControl: {
-    margin: '16px 0 8px'
-  },
-  formLabel: {
-    fontSize: '12px'
   }
 }))
 
