@@ -12,13 +12,13 @@ import {
 import EditIcon from '@material-ui/icons/Edit'
 import StorageIcon from '@material-ui/icons/Storage'
 import styled from '@emotion/styled'
-import PageHeader from '../styled/PageHeader'
-import ScreenLoader from '../components/ScreenLoader'
 import ProjectEmpty from '../components/ProjectEmpty'
 import ProjectForm from '../components/ProjectForm'
 import ProjectDatabase from '../components/ProjectDatabase'
 import { getStorage } from '../storage'
 import { IProject } from '../types'
+import PageHeader from '../components/common/PageHeader'
+import ScreenLoader from '../components/common/ScreenLoader'
 
 interface IProjectForm {
   project?: IProject

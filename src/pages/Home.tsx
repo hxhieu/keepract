@@ -1,7 +1,7 @@
 import React from 'react'
 import ProjectList from '../containers/ProjectList'
 import { useAuthContext } from '../contexts/auth'
-import PageHeader from '../styled/PageHeader'
+import PageHeader from '../components/common/PageHeader'
 
 export default () => {
   const {

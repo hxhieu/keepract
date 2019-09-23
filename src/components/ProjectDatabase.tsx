@@ -13,7 +13,7 @@ import * as str2ab from 'string-to-arraybuffer'
 import { IProject } from '../types'
 import { Credentials, Kdbx, Group } from 'kdbxweb'
 import KdbxGroup from '../components/kdbx/KdbxGroup'
-import ScreenLoader from './ScreenLoader'
+import ScreenLoader from './common/ScreenLoader'
 
 interface IGroupList {
   list?: Group[]
