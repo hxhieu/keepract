@@ -6,29 +6,19 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Typography,
-  InputAdornment,
-  Box,
-  Button,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  FormControl,
-  FormLabel,
-  Input
+  Typography
 } from '@material-ui/core'
-import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
 import CloseIcon from '@material-ui/icons/Close'
-import FingerprintIcon from '@material-ui/icons/Fingerprint'
-import SubjectIcon from '@material-ui/icons/Subject'
-import RefreshIcon from '@material-ui/icons/Refresh'
-import DownloadIcon from '@material-ui/icons/GetApp'
-import StorageIcon from '@material-ui/icons/Storage'
-import KeyIcon from '@material-ui/icons/VpnKey'
 import * as str2ab from 'string-to-arraybuffer'
-import { v4 } from 'uuid'
 import { IProject } from '../types'
-import { Credentials, Kdbx } from 'kdbxweb'
+import { Credentials, Kdbx, Group } from 'kdbxweb'
+import KdbxGroup from '../components/kdbx/KdbxGroup'
+import ScreenLoader from './ScreenLoader'
+
+interface IGroupList {
+  list?: Group[]
+  loading: boolean
+}
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -70,7 +60,10 @@ export default ({
   onClose: () => void
 }) => {
   const classes = useStyles()
-  const [database, setDatabase] = useState<ArrayBuffer>(new ArrayBuffer(0))
+  const [groups, setGroups] = useState<IGroupList>({
+    loading: true,
+    list: undefined
+  })
 
   useEffect(() => {
     const { kdbxFileId: fileId } = project
@@ -81,18 +74,29 @@ export default ({
         alt: 'media'
       })
 
-      const db = str2ab(response.body)
-      const key = str2ab(project.keyFile)
+      const dbBuff = str2ab(response.body)
+      const keyBuff = str2ab(project.keyFile)
 
-      const cred = new Credentials(null, key)
-      Kdbx.load(db, cred)
-        .then(test => {
-          console.log(test.meta)
+      const cred = new Credentials(null, keyBuff)
+      Kdbx.load(dbBuff, cred)
+        .then(db => {
+          setGroups({
+            loading: false,
+            list: db.groups
+          })
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+          console.log(err)
+          setGroups({
+            loading: false,
+            list: undefined
+          })
+        })
     }
     fetchFile()
   }, [project])
+
+  const { loading, list } = groups
 
   return (
     <Dialog fullScreen open={open}>
@@ -111,7 +115,10 @@ export default ({
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Container maxWidth="md">AAA</Container>
+      <Container maxWidth="md">
+        <ScreenLoader loading={loading} />
+        {list && list.length && <KdbxGroup group={list[0]} />}
+      </Container>
     </Dialog>
   )
 }
