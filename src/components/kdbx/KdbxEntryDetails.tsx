@@ -14,6 +14,7 @@ import SubjectIcon from '@material-ui/icons/Subject'
 import CloseIcon from '@material-ui/icons/Close'
 import CopyIcon from '@material-ui/icons/FileCopyOutlined'
 import { Entry, ProtectedValue } from 'kdbxweb'
+import * as copy from 'copy-to-clipboard'
 import ScreenLoader from '../common/ScreenLoader'
 
 const useStyles = makeStyles(theme => ({
@@ -98,7 +99,10 @@ export default ({
                         <InputAdornment position="start">
                           <CopyIcon
                             className={classes.clickable}
-                            onClick={() => {}}
+                            onClick={() => {
+                              copy.default(getValue(value))
+                              alert('Copied!')
+                            }}
                           />
                         </InputAdornment>
                       )
