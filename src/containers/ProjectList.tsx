@@ -31,7 +31,7 @@ interface IProjectList {
 }
 
 interface IProjectDatabase {
-  project: IProject
+  project?: IProject
   open: boolean
 }
 
@@ -50,10 +50,7 @@ export default () => {
     open: false
   })
   const [projectDatabase, setProjectDatabase] = useState<IProjectDatabase>({
-    project: {
-      name: '',
-      uuid: ''
-    },
+    project: undefined,
     open: false
   })
 

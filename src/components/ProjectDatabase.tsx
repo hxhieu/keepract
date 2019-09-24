@@ -35,7 +35,7 @@ export default ({
   open,
   onClose
 }: {
-  project: IProject
+  project?: IProject
   open: boolean
   onClose: () => void
 }) => {
@@ -46,32 +46,33 @@ export default ({
   })
 
   useEffect(() => {
+    if (!project) return
     const { kdbxFileId: fileId } = project
-    if (!fileId) return
+    if (!fileId) {
+      alert('Corrupted project, database undefined')
+      return
+    }
     const fetchFile = async () => {
-      const response = await gapi.client.drive.files.get({
-        fileId,
-        alt: 'media'
-      })
-
-      const dbBuff = str2ab(response.body)
-      const keyBuff = str2ab(project.keyFile)
-
-      const cred = new Credentials(null, keyBuff)
-      Kdbx.load(dbBuff, cred)
-        .then(db => {
-          setGroups({
-            loading: false,
-            list: db.groups
-          })
+      try {
+        const response = await gapi.client.drive.files.get({
+          fileId,
+          alt: 'media'
         })
-        .catch(err => {
-          console.log(err)
-          setGroups({
-            loading: false,
-            list: undefined
-          })
+
+        const dbBuff = str2ab(response.body)
+        const keyBuff = str2ab(project.keyFile)
+
+        const cred = new Credentials(null, keyBuff)
+
+        const db = await Kdbx.load(dbBuff, cred)
+        setGroups({
+          loading: false,
+          list: db.groups
         })
+      } catch (err) {
+        alert(JSON.stringify(err))
+        throw err
+      }
     }
     fetchFile()
   }, [project])
@@ -83,7 +84,7 @@ export default ({
       <AppBar className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            {project.name}
+            {project && project.name}
           </Typography>
           <IconButton
             edge="start"
