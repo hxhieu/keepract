@@ -78,7 +78,7 @@ export default () => {
     const { list } = projects
     // Mutate the state
     const matchIdx = list.findIndex(x => x.uuid === project.uuid)
-    if (matchIdx && matchIdx >= 0) {
+    if (matchIdx >= 0) {
       const allProjects = [...list]
       allProjects[matchIdx] = project
       setProjects({
@@ -88,6 +88,25 @@ export default () => {
     } else {
       setProjects({ ...projects, list: [...list, project] })
     }
+  }
+
+  async function deleteProject(uuid?: string) {
+    if (!uuid) return
+    await storage.removeItem(uuid)
+    // Mutate the state
+    const matchIdx = list.findIndex(x => x.uuid === uuid)
+    if (matchIdx >= 0) {
+      const allProjects = [...list]
+      allProjects.splice(matchIdx, 1)
+      setProjects({
+        ...projects,
+        list: allProjects
+      })
+    }
+    setProjectForm({
+      open: false,
+      project: undefined
+    })
   }
 
   function editProject(project: IProject) {
@@ -174,6 +193,7 @@ export default () => {
           })
         }
         onSave={saveProject}
+        onDelete={deleteProject}
       ></ProjectForm>
       <ProjectDatabase
         project={projectDatabase.project}

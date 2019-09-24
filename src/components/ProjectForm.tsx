@@ -65,12 +65,14 @@ export default ({
   project,
   open,
   onClose,
-  onSave
+  onSave,
+  onDelete
 }: {
   project?: IProject
   open: boolean
   onClose: () => void
   onSave: (values: IProject) => void
+  onDelete: (uuid?: string) => void
 }) => {
   const classes = useStyles()
   const [values, setValues] = useState({
@@ -275,6 +277,15 @@ export default ({
               />
             )}
             <Box className={classes.actions}>
+              {project && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => onDelete(project && project.uuid)}
+                >
+                  Delete
+                </Button>
+              )}
               <Button variant="contained" color="primary" type="submit">
                 Save
               </Button>
