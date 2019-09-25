@@ -1,9 +1,19 @@
 import React, { useState } from 'react'
-import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Chip,
+  Avatar
+} from '@material-ui/core'
+import KeyIcon from '@material-ui/icons/VpnKey'
+import FolderIcon from '@material-ui/icons/Folder'
 import { Group, Entry } from 'kdbxweb'
 import KdbxGroupIcon from './KdbxGroupIcon'
 import KdbxEntry from './KdbxEntry'
 import KdbxEntryDetails from './KdbxEntryDetails'
+import KdbxGroupPopup from './KdbxGroupPopup'
 
 interface IEntryForm {
   entry?: Entry
@@ -15,22 +25,50 @@ export default ({ group }: { group: Group }) => {
     entry: undefined,
     open: false
   })
+  const [subGroup, setSubgroup] = useState<Group>()
 
   const { groups, entries } = group
   const { entry, open } = entryForm
-  console.log(entry)
   return (
     <>
       <List>
         {groups &&
           groups.map(x => (
-            <ListItem button key={x.uuid.id}>
+            <ListItem button key={x.uuid.id} onClick={() => setSubgroup(x)}>
               <ListItemIcon>
                 <KdbxGroupIcon idx={x.icon} />
               </ListItemIcon>
               <ListItemText
                 primary={x.name}
-                secondary={`${x.entries && x.entries.length} entries`}
+                secondary={
+                  <>
+                    {x.entries.length > 0 && (
+                      <Chip
+                        avatar={
+                          <Avatar component="span">
+                            <KeyIcon />
+                          </Avatar>
+                        }
+                        color="primary"
+                        component="a"
+                        label={x.entries.length}
+                        size="small"
+                      ></Chip>
+                    )}
+                    {x.groups.length > 0 && (
+                      <Chip
+                        avatar={
+                          <Avatar component="span">
+                            <FolderIcon />
+                          </Avatar>
+                        }
+                        component="a"
+                        label={x.groups.length}
+                        size="small"
+                      ></Chip>
+                    )}
+                  </>
+                }
               />
             </ListItem>
           ))}
@@ -57,6 +95,11 @@ export default ({ group }: { group: Group }) => {
             open: false
           })
         }}
+      />
+      <KdbxGroupPopup
+        open={!!subGroup}
+        group={subGroup}
+        onClose={() => setSubgroup(undefined)}
       />
     </>
   )
