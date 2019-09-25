@@ -80,13 +80,11 @@ export default () => {
               Keepract
             </Typography>
           </Hidden>
-          <div>
-            {initialising || loading
-              ? renderLoading()
-              : user
-              ? renderUser(user)
-              : renderLogin()}
-          </div>
+          {initialising || loading
+            ? renderLoading()
+            : user
+            ? renderUser(user)
+            : renderLogin()}
         </Toolbar>
       </AppBar>
     </div>
