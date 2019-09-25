@@ -12,6 +12,7 @@ import {
 import EditIcon from '@material-ui/icons/Edit'
 import StorageIcon from '@material-ui/icons/Storage'
 import styled from '@emotion/styled'
+import { produce } from 'immer'
 import ProjectEmpty from '../components/ProjectEmpty'
 import ProjectForm from '../components/ProjectForm'
 import ProjectDatabase from '../components/ProjectDatabase'
@@ -30,11 +31,6 @@ interface IProjectList {
   loading: boolean
 }
 
-interface IProjectDatabase {
-  project?: IProject
-  open: boolean
-}
-
 const Buttons = styled.div({
   textAlign: 'center'
 })
@@ -49,10 +45,7 @@ export default () => {
     project: undefined,
     open: false
   })
-  const [projectDatabase, setProjectDatabase] = useState<IProjectDatabase>({
-    project: undefined,
-    open: false
-  })
+  const [project, setProject] = useState<IProject | undefined>()
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -68,45 +61,42 @@ export default () => {
     loadProjects()
   }, [storage])
 
-  async function saveProject(project: IProject) {
-    await storage.setItem(project.uuid, project)
-    // Close the form
+  function closeProjectForm() {
     setProjectForm({
       ...projectForm,
+      project: undefined,
       open: false
     })
-    const { list } = projects
+  }
+  async function saveProject(project: IProject) {
+    await storage.setItem(project.uuid, project)
     // Mutate the state
-    const matchIdx = list.findIndex(x => x.uuid === project.uuid)
-    if (matchIdx >= 0) {
-      const allProjects = [...list]
-      allProjects[matchIdx] = project
-      setProjects({
-        ...projects,
-        list: allProjects
+    setProjects(
+      produce(projects, draft => {
+        const matchIdx = draft.list.findIndex(x => x.uuid === project.uuid)
+        if (matchIdx >= 0) {
+          draft.list[matchIdx] = { ...project }
+        } else {
+          draft.list.push({ ...project })
+        }
       })
-    } else {
-      setProjects({ ...projects, list: [...list, project] })
-    }
+    )
+    closeProjectForm()
   }
 
   async function deleteProject(uuid?: string) {
     if (!uuid) return
     await storage.removeItem(uuid)
     // Mutate the state
-    const matchIdx = list.findIndex(x => x.uuid === uuid)
-    if (matchIdx >= 0) {
-      const allProjects = [...list]
-      allProjects.splice(matchIdx, 1)
-      setProjects({
-        ...projects,
-        list: allProjects
+    setProjects(
+      produce(projects, draft => {
+        const matchIdx = draft.list.findIndex(x => x.uuid === uuid)
+        if (matchIdx >= 0) {
+          draft.list.splice(matchIdx, 1)
+        }
       })
-    }
-    setProjectForm({
-      open: false,
-      project: undefined
-    })
+    )
+    closeProjectForm()
   }
 
   function editProject(project: IProject) {
@@ -123,10 +113,7 @@ export default () => {
         open: true
       })
     } else {
-      setProjectDatabase({
-        project,
-        open: true
-      })
+      setProject(project)
     }
   }
 
@@ -186,25 +173,16 @@ export default () => {
       <ProjectForm
         project={projectForm.project}
         open={projectForm.open}
-        onClose={() =>
-          setProjectForm({
-            ...projectForm,
-            open: false
-          })
-        }
+        onClose={closeProjectForm}
         onSave={saveProject}
         onDelete={deleteProject}
       ></ProjectForm>
-      <ProjectDatabase
-        project={projectDatabase.project}
-        open={projectDatabase.open}
-        onClose={() =>
-          setProjectDatabase({
-            ...projectDatabase,
-            open: false
-          })
-        }
-      ></ProjectDatabase>
+      {project && (
+        <ProjectDatabase
+          project={project}
+          onClose={() => setProject(undefined)}
+        ></ProjectDatabase>
+      )}
     </>
   )
 }

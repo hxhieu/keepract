@@ -98,7 +98,8 @@ export default ({
       password: open ? (project && project.password) || '' : '',
       keyFile: open ? (project && project.keyFile) || '' : ''
     })
-  }, [open, project])
+    setFileId(values.kdbxFileId)
+  }, [open, project, values.kdbxFileId])
 
   function onChange(key: string, evt: any | string) {
     let value = ''
