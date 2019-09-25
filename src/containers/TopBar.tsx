@@ -18,6 +18,9 @@ const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1
   },
+  topBar: {
+    justifyContent: 'space-between'
+  },
   menuButton: {
     marginRight: theme.spacing(2)
   },
@@ -62,7 +65,7 @@ export default () => {
   return (
     <div className={classes.root}>
       <AppBar position="static">
-        <Toolbar>
+        <Toolbar className={classes.topBar}>
           <IconButton
             edge="start"
             className={classes.menuButton}
@@ -77,11 +80,13 @@ export default () => {
               Keepract
             </Typography>
           </Hidden>
-          {initialising || loading
-            ? renderLoading()
-            : user
-            ? renderUser(user)
-            : renderLogin()}
+          <div>
+            {initialising || loading
+              ? renderLoading()
+              : user
+              ? renderUser(user)
+              : renderLogin()}
+          </div>
         </Toolbar>
       </AppBar>
     </div>
