@@ -1,7 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, FC } from 'react'
 import firebase from 'firebase'
 import 'firebase/auth'
-import { useAuthContext } from '../contexts/auth'
 import { getStorage } from '../storage'
 
 const ACCESS_TOKEN_KEY = 'accessToken'
@@ -34,8 +33,7 @@ const mapUser = (firebaseUser: firebase.User) => {
   return { email }
 }
 
-export default () => {
-  const { dispatch } = useAuthContext()
+const Firebase: FC = () => {
   const tokenStore = getStorage('token')
 
   useEffect(() => {
@@ -44,14 +42,14 @@ export default () => {
     // listen for auth state changes
     const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
-        dispatch({
-          type: 'SET_AUTH',
-          payload: {
-            initialising: false,
-            user: null,
-            accessToken: null,
-          },
-        })
+        // dispatch({
+        //   type: 'SET_AUTH',
+        //   payload: {
+        //     initialising: false,
+        //     user: null,
+        //     accessToken: null,
+        //   },
+        // })
         return
       }
 
@@ -82,14 +80,14 @@ export default () => {
           error: '',
           state: '',
         })
-        dispatch({
-          type: 'SET_AUTH',
-          payload: {
-            initialising: false,
-            user: mapUser(user),
-            accessToken,
-          },
-        })
+        // dispatch({
+        //   type: 'SET_AUTH',
+        //   payload: {
+        //     initialising: false,
+        //     user: mapUser(user),
+        //     accessToken,
+        //   },
+        // })
       }
     })
 
@@ -120,9 +118,11 @@ export default () => {
 
     // unsubscribe to the listener when unmounting
     return () => unsubscribe()
-  }, [dispatch, tokenStore])
+  }, [tokenStore])
 
   // This component has no presenter
   return null
 }
+
+export default Firebase
 export { login, logout }

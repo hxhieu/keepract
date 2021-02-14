@@ -1,16 +1,13 @@
 import React, { useState } from 'react'
-import { navigate } from '@reach/router'
+import { PageHeader, Button } from 'antd'
+import { geekblue as mainColour } from '@ant-design/colors'
+import styled from '@emotion/styled'
 import { login, logout } from './Firebase'
-import { useAuthContext, IAuthUser } from '../contexts/auth'
 
-export default () => {
-  const { auth } = useAuthContext()
-  const { user, initialising } = auth
+const TopBar = () => {
   const [loading, setLoading] = useState(false)
 
-  const gotoHome = () => {
-    navigate('/')
-  }
+  const gotoHome = () => {}
   const handleLogin = () => {
     setLoading(true)
     login()
@@ -35,32 +32,27 @@ export default () => {
   //   </Button>
   // )
 
+  const Header = styled(PageHeader)`
+    background: ${mainColour};
+    border-bottom: 1px solid ${mainColour[1]};
+    .ant-page-header-heading-title {
+      color: ${mainColour[5]};
+    }
+  `
   return (
-    <div></div>
-    // <div className={classes.root}>
-    //   <AppBar position="static">
-    //     <Toolbar className={classes.topBar}>
-    //       <IconButton
-    //         edge="start"
-    //         className={classes.menuButton}
-    //         color="inherit"
-    //         aria-label="menu"
-    //         onClick={gotoHome}
-    //       >
-    //         <HomeIcon />
-    //       </IconButton>
-    //       <Hidden xsDown>
-    //         <Typography variant="h6" className={classes.title}>
-    //           Keepract
-    //         </Typography>
-    //       </Hidden>
-    //       {initialising || loading
-    //         ? renderLoading()
-    //         : user
-    //         ? renderUser(user)
-    //         : renderLogin()}
-    //     </Toolbar>
-    //   </AppBar>
-    // </div>
+    <Header
+      className="site-page-header"
+      onBack={() => null}
+      title="Mitmeo Vault"
+      subTitle="This is a subtitle"
+      backIcon={false}
+      extra={[
+        <Button key="1" type="primary" onClick={() => login()}>
+          Login
+        </Button>,
+      ]}
+    />
   )
 }
+
+export default TopBar

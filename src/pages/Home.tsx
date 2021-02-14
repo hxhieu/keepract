@@ -1,16 +1,7 @@
-import React from 'react'
-import ProjectList from '../containers/ProjectList'
-import { useAuthContext } from '../contexts/auth'
-import PageHeader from '../components/common/PageHeader'
+import { FC } from 'react'
 
-export default () => {
-  const {
-    auth: { accessToken }
-  } = useAuthContext()
-
-  return accessToken ? (
-    <ProjectList />
-  ) : (
-    <PageHeader>Welcome to Keepract</PageHeader>
-  )
+const Home: FC = () => {
+  return <div></div>
 }
+
+export default Home
