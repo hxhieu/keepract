@@ -1,9 +1,6 @@
 import { createContext, useContext, Dispatch } from 'react'
+import { IAuthUser } from '../@types'
 import { IReducerAction } from '../types'
-
-export interface IAuthUser {
-  email?: string
-}
 
 export interface IAuthState {
   user?: IAuthUser
@@ -19,7 +16,7 @@ export interface IAuthContext {
 const initialAuth: IAuthState = {
   user: undefined,
   initialising: true,
-  accessToken: undefined
+  accessToken: undefined,
 }
 
 const authContext = createContext({} as IAuthContext)

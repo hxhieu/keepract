@@ -1,7 +1,8 @@
 import { useEffect, FC } from 'react'
-import firebase from 'firebase'
+import { useRecoilState, useSetRecoilState } from 'recoil'
+import firebase from 'firebase/app'
 import 'firebase/auth'
-import { getStorage } from '../storage'
+import { accessTokenState } from '../state/shell'
 
 const ACCESS_TOKEN_KEY = 'accessToken'
 const provider = new firebase.auth.GoogleAuthProvider()
@@ -23,38 +24,18 @@ const login = () => {
   firebase.auth().signInWithRedirect(provider)
 }
 const logout = async () => {
-  await getStorage('token').removeItem(ACCESS_TOKEN_KEY, undefined)
   firebase.auth().signOut()
 }
 
-const mapUser = (firebaseUser: firebase.User) => {
-  if (!firebaseUser) return null
-  const { email } = firebaseUser
-  return { email }
-}
-
 const Firebase: FC = () => {
-  const tokenStore = getStorage('token')
+  const [accessToken, setAccessToken] = useRecoilState(accessTokenState)
 
   useEffect(() => {
-    // Temp value to deal with async
-    let accessToken: string = ''
     // listen for auth state changes
     const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
-        // dispatch({
-        //   type: 'SET_AUTH',
-        //   payload: {
-        //     initialising: false,
-        //     user: null,
-        //     accessToken: null,
-        //   },
-        // })
+        setAccessToken(undefined)
         return
-      }
-
-      if (!accessToken) {
-        accessToken = (await tokenStore.getItem(ACCESS_TOKEN_KEY)) || ''
       }
 
       // Need new access token
@@ -70,9 +51,9 @@ const Firebase: FC = () => {
         // await user.reauthenticateWithCredential(credential)
 
         // Update GAPI with new tokens
-        const idToken = await user.getIdTokenResult()
+        const tokenResult = await user.getIdTokenResult()
         const expiresIn = Math.floor(
-          (Date.parse(idToken.expirationTime) - new Date().getTime()) / 1000
+          (Date.parse(tokenResult.expirationTime) - new Date().getTime()) / 1000
         )
         gapi.auth.setToken({
           access_token: accessToken,
@@ -80,14 +61,7 @@ const Firebase: FC = () => {
           error: '',
           state: '',
         })
-        // dispatch({
-        //   type: 'SET_AUTH',
-        //   payload: {
-        //     initialising: false,
-        //     user: mapUser(user),
-        //     accessToken,
-        //   },
-        // })
+        setAccessToken(tokenResult.token)
       }
     })
 
@@ -97,11 +71,8 @@ const Firebase: FC = () => {
       .getRedirectResult()
       .then(async (result) => {
         if (result.credential) {
-          // We need to store the result in a temp var because save to local storage is async
-          // and will happen AFTER the firebase onAuthStateChanged
-          accessToken = (result.credential as firebase.auth.OAuthCredential)
-            .accessToken as string
-          await tokenStore.setItem(ACCESS_TOKEN_KEY, accessToken)
+          const authResult = result.credential as firebase.auth.OAuthCredential
+          setAccessToken(authResult.accessToken)
         }
       })
       .catch((error) => {
@@ -118,7 +89,7 @@ const Firebase: FC = () => {
 
     // unsubscribe to the listener when unmounting
     return () => unsubscribe()
-  }, [tokenStore])
+  }, [accessToken])
 
   // This component has no presenter
   return null

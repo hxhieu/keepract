@@ -1,16 +1,66 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { PageHeader, Button } from 'antd'
+import { useRecoilState } from 'recoil'
 import { geekblue as mainColour } from '@ant-design/colors'
 import styled from '@emotion/styled'
-import { login, logout } from './Firebase'
+import firebase from 'firebase/app'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { accessTokenState } from '../state/shell'
 
 const TopBar = () => {
-  const [loading, setLoading] = useState(false)
+  const [user, loading, error] = useAuthState(firebase.auth())
+  const [accessToken, setAccessToken] = useRecoilState(accessTokenState)
 
-  const gotoHome = () => {}
-  const handleLogin = () => {
-    setLoading(true)
-    login()
+  firebase
+    .auth()
+    .getRedirectResult()
+    .then(async (result) => {
+      if (result.credential) {
+        const authResult = result.credential as firebase.auth.OAuthCredential
+        console.log(authResult)
+      }
+    })
+    .catch((error) => {
+      // TODO: Handle errors
+      // // Handle Errors here.
+      // var errorCode = error.code
+      // var errorMessage = error.message
+      // // The email of the user's account used.
+      // var email = error.email
+      // // The firebase.auth.AuthCredential type that was used.
+      // var credential = error.credential
+      // // ...
+    })
+
+  const login = () => {
+    const provider = new firebase.auth.GoogleAuthProvider()
+    // TODO: Restricted scope
+    provider.addScope('https://www.googleapis.com/auth/drive.readonly')
+    firebase.auth().signInWithRedirect(provider)
+    // firebase
+    //   .auth()
+    //   .getRedirectResult()
+    //   .then(async (result) => {
+    //     if (result.credential) {
+    //       const authResult = result.credential as firebase.auth.OAuthCredential
+    //       console.log(authResult.accessToken)
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     // TODO: Handle errors
+    //     // // Handle Errors here.
+    //     // var errorCode = error.code
+    //     // var errorMessage = error.message
+    //     // // The email of the user's account used.
+    //     // var email = error.email
+    //     // // The firebase.auth.AuthCredential type that was used.
+    //     // var credential = error.credential
+    //     // // ...
+    //   })
+  }
+  const logout = () => {
+    setAccessToken(undefined)
+    firebase.auth().signOut()
   }
 
   // const renderLoading = () => <CircularProgress color="secondary" />
@@ -44,11 +94,16 @@ const TopBar = () => {
       className="site-page-header"
       onBack={() => null}
       title="Mitmeo Vault"
-      subTitle="This is a subtitle"
+      subTitle={user && user.email}
       backIcon={false}
       extra={[
-        <Button key="1" type="primary" onClick={() => login()}>
-          Login
+        <Button
+          key="1"
+          type="primary"
+          loading={loading}
+          onClick={() => (user ? logout() : login())}
+        >
+          {user ? 'Logout' : 'Login'}
         </Button>,
       ]}
     />
