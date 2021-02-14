@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import firebase, { User, auth } from 'firebase/app'
+import firebase from 'firebase'
 import 'firebase/auth'
 import { useAuthContext } from '../contexts/auth'
 import { getStorage } from '../storage'
@@ -15,7 +15,7 @@ var firebaseConfig = {
   apiKey: process.env.REACT_APP_FIRE_API_KEY,
   authDomain: 'keepract.firebaseapp.com',
   databaseURL: 'https://keepract.firebaseio.com',
-  projectId: 'keepract'
+  projectId: 'keepract',
 }
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig)
@@ -28,7 +28,7 @@ const logout = async () => {
   firebase.auth().signOut()
 }
 
-const mapUser = (firebaseUser: User) => {
+const mapUser = (firebaseUser: firebase.User) => {
   if (!firebaseUser) return null
   const { email } = firebaseUser
   return { email }
@@ -42,21 +42,21 @@ export default () => {
     // Temp value to deal with async
     let accessToken: string = ''
     // listen for auth state changes
-    const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
+    const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
         dispatch({
           type: 'SET_AUTH',
           payload: {
             initialising: false,
             user: null,
-            accessToken: null
-          }
+            accessToken: null,
+          },
         })
         return
       }
 
       if (!accessToken) {
-        accessToken = await tokenStore.getItem(ACCESS_TOKEN_KEY)
+        accessToken = (await tokenStore.getItem(ACCESS_TOKEN_KEY)) || ''
       }
 
       // Need new access token
@@ -80,15 +80,15 @@ export default () => {
           access_token: accessToken,
           expires_in: expiresIn.toString(),
           error: '',
-          state: ''
+          state: '',
         })
         dispatch({
           type: 'SET_AUTH',
           payload: {
             initialising: false,
             user: mapUser(user),
-            accessToken
-          }
+            accessToken,
+          },
         })
       }
     })
@@ -97,16 +97,16 @@ export default () => {
     firebase
       .auth()
       .getRedirectResult()
-      .then(async result => {
+      .then(async (result) => {
         if (result.credential) {
           // We need to store the result in a temp var because save to local storage is async
           // and will happen AFTER the firebase onAuthStateChanged
-          accessToken = (result.credential as auth.OAuthCredential)
+          accessToken = (result.credential as firebase.auth.OAuthCredential)
             .accessToken as string
           await tokenStore.setItem(ACCESS_TOKEN_KEY, accessToken)
         }
       })
-      .catch(error => {
+      .catch((error) => {
         // TODO: Handle errors
         // // Handle Errors here.
         // var errorCode = error.code

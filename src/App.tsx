@@ -1,8 +1,11 @@
+import { Layout, Menu } from 'antd'
+import {
+  UploadOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from '@ant-design/icons'
+
 import React, { useReducer } from 'react'
-import { Router } from '@reach/router'
-import { ThemeProvider } from '@material-ui/styles'
-import { Container, CssBaseline } from '@material-ui/core'
-import { createMuiTheme } from '@material-ui/core/styles'
 import Home from './pages/Home'
 import TopBar from './containers/TopBar'
 import Alert from './containers/Alert'
@@ -11,32 +14,66 @@ import AlertContext, { initialAlert } from './contexts/alert'
 import alertReducer from './reducers/alertReducer'
 import AuthContext, { initialAuth } from './contexts/auth'
 import authReducer from './reducers/authReducer'
-import { RouterPage } from './RouterPage'
+import MainRouter from './router'
 
-const theme = createMuiTheme({
-  palette: {
-    type: 'dark'
-  }
-})
+const { Header, Content, Footer, Sider } = Layout
 
-function App() {
+const App = () => {
   const [alert, alertDispatch] = useReducer(alertReducer, initialAlert)
   const [auth, authDispatch] = useReducer(authReducer, initialAuth)
 
   return (
     <AlertContext.Provider value={{ alert, dispatch: alertDispatch }}>
       <AuthContext.Provider value={{ auth, dispatch: authDispatch }}>
+        <Layout>
+          <Sider
+            breakpoint="lg"
+            collapsedWidth="0"
+            onBreakpoint={(broken) => {
+              console.log(broken)
+            }}
+            onCollapse={(collapsed, type) => {
+              console.log(collapsed, type)
+            }}
+          >
+            <div className="logo" />
+            <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}>
+              <Menu.Item key="1" icon={<UserOutlined />}>
+                nav 1
+              </Menu.Item>
+              <Menu.Item key="2" icon={<VideoCameraOutlined />}>
+                nav 2
+              </Menu.Item>
+              <Menu.Item key="3" icon={<UploadOutlined />}>
+                nav 3
+              </Menu.Item>
+              <Menu.Item key="4" icon={<UserOutlined />}>
+                nav 4
+              </Menu.Item>
+            </Menu>
+          </Sider>
+          <Layout>
+            <Header
+              className="site-layout-sub-header-background"
+              style={{ padding: 0 }}
+            />
+            <Content style={{ margin: '24px 16px 0' }}>
+              {/* <Firebase />
+            <Alert /> */}
+              <MainRouter />
+            </Content>
+            <Footer style={{ textAlign: 'center' }}>
+              Ant Design ©2018 Created by Ant UED
+            </Footer>
+          </Layout>
+        </Layout>
+        {/* ,
         <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Firebase />
+          
           <TopBar />
-          <Container maxWidth="md">
-            <Router>
-              <RouterPage path="/" pageComponent={<Home />} />
-            </Router>
-          </Container>
-          <Alert />
-        </ThemeProvider>
+          <Container maxWidth="md"></Container>
+          
+        </ThemeProvider> */}
       </AuthContext.Provider>
     </AlertContext.Provider>
   )

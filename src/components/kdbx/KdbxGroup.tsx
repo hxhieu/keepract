@@ -1,14 +1,4 @@
 import React, { useState } from 'react'
-import {
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Chip,
-  Avatar
-} from '@material-ui/core'
-import KeyIcon from '@material-ui/icons/VpnKey'
-import FolderIcon from '@material-ui/icons/Folder'
 import { Group, Entry } from 'kdbxweb'
 import KdbxGroupIcon from './KdbxGroupIcon'
 import KdbxEntry from './KdbxEntry'
@@ -23,7 +13,7 @@ interface IEntryForm {
 export default ({ group }: { group: Group }) => {
   const [entryForm, setEntryForm] = useState<IEntryForm>({
     entry: undefined,
-    open: false
+    open: false,
   })
   const [subGroup, setSubgroup] = useState<Group>()
 
@@ -31,7 +21,7 @@ export default ({ group }: { group: Group }) => {
   const { entry, open } = entryForm
   return (
     <>
-      <List>
+      {/* <List>
         {groups &&
           groups.map(x => (
             <ListItem button key={x.uuid.id} onClick={() => setSubgroup(x)}>
@@ -100,7 +90,7 @@ export default ({ group }: { group: Group }) => {
         open={!!subGroup}
         group={subGroup}
         onClose={() => setSubgroup(undefined)}
-      />
+      /> */}
     </>
   )
 }

@@ -1,31 +1,22 @@
 import React, { useState, useEffect } from 'react'
-import {
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  List,
-  Box,
-  CircularProgress
-} from '@material-ui/core'
-import StorageIcon from '@material-ui/icons/Storage'
 import styled from '@emotion/styled'
 import { useAuthContext } from '../contexts/auth'
 
-const Container = styled(Box)({
-  textAlign: 'center'
-})
+// const Container = styled(Box)({
+//   textAlign: 'center'
+// })
 
-const Loader = styled(CircularProgress)`
-  margin-top: 20px;
-`
+// const Loader = styled(CircularProgress)`
+//   margin-top: 20px;
+// `
 
 const ErrorMessage = styled.label({
   display: 'block',
-  margin: '20px'
+  margin: '20px',
 })
 
 export default ({
-  onSelect
+  onSelect,
 }: {
   onSelect: (name: string, id: string, url?: string) => void
 }) => {
@@ -43,7 +34,7 @@ export default ({
     const options = {
       pageSize: 100,
       fields: 'files(id, name, webContentLink)',
-      q: `name contains '.kdbx'`
+      q: `name contains '.kdbx'`,
     }
     const fetchFiles = async () => {
       try {
@@ -63,26 +54,27 @@ export default ({
   }, [accessToken])
 
   return (
-    <Container>
-      {loading && <Loader size={70} />}
-      {error ? (
-        <ErrorMessage>{error}</ErrorMessage>
-      ) : (
-        <List>
-          {files.map(({ id, name, webContentLink }) => (
-            <ListItem
-              button
-              key={id}
-              onClick={() => onSelect(name || '', id || '', webContentLink)}
-            >
-              <ListItemIcon>
-                <StorageIcon />
-              </ListItemIcon>
-              <ListItemText primary={name} />
-            </ListItem>
-          ))}
-        </List>
-      )}
-    </Container>
+    <div></div>
+    // <Container>
+    //   {loading && <Loader size={70} />}
+    //   {error ? (
+    //     <ErrorMessage>{error}</ErrorMessage>
+    //   ) : (
+    //     <List>
+    //       {files.map(({ id, name, webContentLink }) => (
+    //         <ListItem
+    //           button
+    //           key={id}
+    //           onClick={() => onSelect(name || '', id || '', webContentLink)}
+    //         >
+    //           <ListItemIcon>
+    //             <StorageIcon />
+    //           </ListItemIcon>
+    //           <ListItemText primary={name} />
+    //         </ListItem>
+    //       ))}
+    //     </List>
+    //   )}
+    // </Container>
   )
 }

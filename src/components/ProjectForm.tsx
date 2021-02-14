@@ -1,72 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { makeStyles } from '@material-ui/core/styles'
-import {
-  Dialog,
-  Container,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  InputAdornment,
-  Box,
-  Button,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  FormControl,
-  FormLabel,
-  Input
-} from '@material-ui/core'
-import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
-import CloseIcon from '@material-ui/icons/Close'
-import FingerprintIcon from '@material-ui/icons/Fingerprint'
-import SubjectIcon from '@material-ui/icons/Subject'
-import RefreshIcon from '@material-ui/icons/Refresh'
-import DownloadIcon from '@material-ui/icons/GetApp'
-import StorageIcon from '@material-ui/icons/Storage'
-import KeyIcon from '@material-ui/icons/VpnKey'
 import * as ab2str from 'arraybuffer-to-string'
 import { v4 } from 'uuid'
 import GDriveFile from './GDriveFile'
 import { IProject } from '../types'
-
-const useStyles = makeStyles(theme => ({
-  appBar: {
-    position: 'relative'
-  },
-  title: {
-    marginLeft: theme.spacing(2),
-    flex: 1
-  },
-  clickable: {
-    color: '#aaa',
-    cursor: 'pointer',
-    '&:hover': {
-      color: '#fff'
-    }
-  },
-  actions: {
-    marginTop: '10px',
-    display: 'flex',
-    justifyContent: 'flex-end'
-  },
-  credType: {
-    flexDirection: 'row'
-  },
-  formControl: {
-    margin: '16px 0 8px'
-  },
-  formLabel: {
-    fontSize: '12px'
-  }
-}))
 
 export default ({
   project,
   open,
   onClose,
   onSave,
-  onDelete
+  onDelete,
 }: {
   project?: IProject
   open: boolean
@@ -74,7 +17,7 @@ export default ({
   onSave: (values: IProject) => void
   onDelete: (uuid?: string) => void
 }) => {
-  const classes = useStyles()
+  // const classes = useStyles()
   const [values, setValues] = useState({
     uuid: '',
     name: '',
@@ -82,7 +25,7 @@ export default ({
     kdbxName: '',
     credType: '',
     password: '',
-    keyFile: ''
+    keyFile: '',
   })
   const [openFile, setOpenFile] = useState(false)
   const [fileId, setFileId] = useState('')
@@ -96,7 +39,7 @@ export default ({
       kdbxName: open ? (project && project.kdbxName) || '' : '',
       credType: open ? (project && project.credType) || '' : '',
       password: open ? (project && project.password) || '' : '',
-      keyFile: open ? (project && project.keyFile) || '' : ''
+      keyFile: open ? (project && project.keyFile) || '' : '',
     })
     setFileId(values.kdbxFileId)
   }, [open, project, values.kdbxFileId])
@@ -111,7 +54,7 @@ export default ({
           value = ab2str(reader.result)
           setValues({
             ...values,
-            [key]: value
+            [key]: value,
           })
         }
         reader.readAsArrayBuffer(evt.target.files[0])
@@ -124,7 +67,7 @@ export default ({
 
     setValues({
       ...values,
-      [key]: value
+      [key]: value,
     })
 
     if (key === 'kdbxName') setOpenFile(false)
@@ -132,7 +75,7 @@ export default ({
 
   return (
     <>
-      <Dialog fullScreen open={open}>
+      {/* <Dialog fullScreen open={open}>
         <AppBar className={classes.appBar}>
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
@@ -293,10 +236,10 @@ export default ({
             </Box>
           </ValidatorForm>
         </Container>
-      </Dialog>
+      </Dialog> */}
 
       {/* GDrive dialog */}
-      <Dialog open={openFile} fullWidth maxWidth="sm">
+      {/* <Dialog open={openFile} fullWidth maxWidth="sm">
         <AppBar className={classes.appBar}>
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
@@ -319,7 +262,7 @@ export default ({
             setFileId(id || '')
           }}
         />
-      </Dialog>
+      </Dialog> */}
     </>
   )
 }

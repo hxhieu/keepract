@@ -1,11 +1,9 @@
 import React from 'react'
-import FolderIcon from '@material-ui/icons/Folder'
-import DeleteIcon from '@material-ui/icons/Delete'
 
 export default ({ idx }: { idx: number }) => {
   return (
     <>
-      {idx === 0 && <FolderIcon />}
+      {/* {idx === 0 && <FolderIcon />}
       {idx === 1 && <FolderIcon />}
       {idx === 2 && <FolderIcon />}
       {idx === 3 && <FolderIcon />}
@@ -73,7 +71,7 @@ export default ({ idx }: { idx: number }) => {
       {idx === 65 && <FolderIcon />}
       {idx === 66 && <FolderIcon />}
       {idx === 67 && <FolderIcon />}
-      {idx === 68 && <FolderIcon />}
+      {idx === 68 && <FolderIcon />} */}
     </>
   )
 }

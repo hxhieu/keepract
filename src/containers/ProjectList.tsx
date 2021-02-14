@@ -1,16 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import {
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListItemSecondaryAction,
-  IconButton,
-  Button,
-  Chip
-} from '@material-ui/core'
-import EditIcon from '@material-ui/icons/Edit'
-import StorageIcon from '@material-ui/icons/Storage'
 import styled from '@emotion/styled'
 import { produce } from 'immer'
 import ProjectEmpty from '../components/ProjectEmpty'
@@ -32,18 +20,18 @@ interface IProjectList {
 }
 
 const Buttons = styled.div({
-  textAlign: 'center'
+  textAlign: 'center',
 })
 
 export default () => {
   const storage = getStorage('project')
   const [projects, setProjects] = useState<IProjectList>({
     list: [],
-    loading: true
+    loading: true,
   })
   const [projectForm, setProjectForm] = useState<IProjectForm>({
     project: undefined,
-    open: false
+    open: false,
   })
   const [project, setProject] = useState<IProject | undefined>()
 
@@ -65,15 +53,15 @@ export default () => {
     setProjectForm({
       ...projectForm,
       project: undefined,
-      open: false
+      open: false,
     })
   }
   async function saveProject(project: IProject) {
     await storage.setItem(project.uuid, project)
     // Mutate the state
     setProjects(
-      produce(projects, draft => {
-        const matchIdx = draft.list.findIndex(x => x.uuid === project.uuid)
+      produce(projects, (draft) => {
+        const matchIdx = draft.list.findIndex((x) => x.uuid === project.uuid)
         if (matchIdx >= 0) {
           draft.list[matchIdx] = { ...project }
         } else {
@@ -89,8 +77,8 @@ export default () => {
     await storage.removeItem(uuid)
     // Mutate the state
     setProjects(
-      produce(projects, draft => {
-        const matchIdx = draft.list.findIndex(x => x.uuid === uuid)
+      produce(projects, (draft) => {
+        const matchIdx = draft.list.findIndex((x) => x.uuid === uuid)
         if (matchIdx >= 0) {
           draft.list.splice(matchIdx, 1)
         }
@@ -102,7 +90,7 @@ export default () => {
   function editProject(project: IProject) {
     setProjectForm({
       project,
-      open: true
+      open: true,
     })
   }
 
@@ -110,7 +98,7 @@ export default () => {
     if (!project.credType) {
       setProjectForm({
         project,
-        open: true
+        open: true,
       })
     } else {
       setProject(project)
@@ -123,7 +111,7 @@ export default () => {
     <>
       <PageHeader>Projects</PageHeader>
       <ScreenLoader loading={loading} />
-      {list.length ? (
+      {/* {list.length ? (
         <List>
           {list.map(x => (
             <ListItem button key={x.uuid} onClick={() => loadProject(x)}>
@@ -182,7 +170,7 @@ export default () => {
           project={project}
           onClose={() => setProject(undefined)}
         ></ProjectDatabase>
-      )}
+      )} */}
     </>
   )
 }
