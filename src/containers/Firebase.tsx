@@ -1,8 +1,8 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
-import { FC } from 'react'
-import { useSetRecoilState } from 'recoil'
+import { FC, useEffect } from 'react'
+import { useRecoilState } from 'recoil'
 import { message as messageBox } from 'antd'
 import { accessTokenState } from '../state/shell'
 
@@ -35,7 +35,7 @@ const login = () => {
 const getAuth = () => firebase.auth()
 
 const Firebase: FC = () => {
-  const setAccessToken = useSetRecoilState(accessTokenState)
+  const [accessToken, setAccessToken] = useRecoilState(accessTokenState)
 
   // Check existing login
   firebase.auth().onAuthStateChanged(async (user) => {
@@ -50,7 +50,7 @@ const Firebase: FC = () => {
     // Token has expired
     if (Date.now() > exp * 1000) {
       // Need to relogin
-      login()
+      return login()
     }
   })
 
@@ -67,6 +67,18 @@ const Firebase: FC = () => {
     .catch(({ message }: { message: string }) => {
       messageBox.error(`${message}`, 0)
     })
+
+  useEffect(() => {
+    // All good, we can set the token for GAPI
+    if (accessToken) {
+      gapi.auth.setToken({
+        access_token: accessToken,
+        expires_in: '',
+        error: '',
+        state: '',
+      })
+    }
+  }, [accessToken])
 
   // This component has no presenter
   return null

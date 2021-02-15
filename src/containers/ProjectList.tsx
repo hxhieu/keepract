@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, FC } from 'react'
 import styled from '@emotion/styled'
 import { produce } from 'immer'
 import ProjectEmpty from '../components/ProjectEmpty'
@@ -23,7 +23,7 @@ const Buttons = styled.div({
   textAlign: 'center',
 })
 
-export default () => {
+const ProjectList: FC = () => {
   const storage = getStorage('project')
   const [projects, setProjects] = useState<IProjectList>({
     list: [],
@@ -47,7 +47,7 @@ export default () => {
       setProjects({ list: projects, loading: false })
     }
     loadProjects()
-  }, [storage])
+  }, [])
 
   function closeProjectForm() {
     setProjectForm({
@@ -174,3 +174,5 @@ export default () => {
     </>
   )
 }
+
+export default ProjectList

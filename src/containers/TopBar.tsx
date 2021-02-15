@@ -31,7 +31,7 @@ const TopBar = () => {
 
   useEffect(() => {
     if (startAuth || loading) {
-      return setButtonLabel('')
+      return setButtonLabel('Processing...')
     }
     setButtonLabel(accessToken ? 'Logout' : 'Login')
   }, [startAuth, loading, accessToken])
@@ -48,7 +48,7 @@ const TopBar = () => {
       className="site-page-header"
       onBack={() => null}
       title="Mitmeo Vault"
-      subTitle={user && user.email}
+      subTitle={accessToken && user && user.email}
       backIcon={false}
       extra={[
         <Button
