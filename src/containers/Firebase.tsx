@@ -49,8 +49,11 @@ const Firebase: FC = () => {
 
     // Token has expired
     if (Date.now() > exp * 1000) {
-      // Need to relogin
-      return login()
+      // // Clean up the offline detail as the user will need to re-login
+      // logout()
+      // setAccessToken(undefined)
+      // TODO: Check if this work
+      user.reauthenticateWithRedirect(buildProvider())
     }
   })
 
