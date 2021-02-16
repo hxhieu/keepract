@@ -1,9 +1,18 @@
 import React, { useState, useEffect, FC } from 'react'
-import { Form } from 'antd'
+import {
+  ToolTwoTone,
+  ReloadOutlined,
+  TagTwoTone,
+  DatabaseTwoTone,
+  DownloadOutlined,
+} from '@ant-design/icons'
+import { Form, Input, Button } from 'antd'
+import styled from '@emotion/styled'
 import * as ab2str from 'arraybuffer-to-string'
-import { v4 } from 'uuid'
+import { nanoid } from 'nanoid'
 import GDriveFile from './GDriveFile'
 import { IProject } from '../types'
+import { primaryBorder, primaryColour } from '../styles'
 
 interface ProjectFormProps {
   project?: IProject
@@ -11,11 +20,32 @@ interface ProjectFormProps {
   onDelete: (uuid: string) => void
 }
 
+const suffixButtonStyle = `
+  font-size: 1.25rem;
+  &:hover {
+    color: ${primaryColour};
+  }
+`
+
+const Wrapper = styled.div`
+  max-width: 640px;
+  margin: 0 auto;
+`
+
+const GenerateUuidButton = styled(ReloadOutlined)`
+  ${suffixButtonStyle}
+`
+
+const DownloadKdbxButton = styled(DownloadOutlined)`
+  ${suffixButtonStyle}
+`
+
 const ProjectForm: FC<ProjectFormProps> = (props) => {
+  const [form] = Form.useForm()
   const { uuid, name, kdbxFileId, kdbxName, credType, password, keyFile } =
     props.project || {}
   const [state, setState] = useState<IProject>({
-    uuid,
+    uuid: uuid || nanoid(),
     name,
     kdbxFileId,
     kdbxName,
@@ -26,37 +56,74 @@ const ProjectForm: FC<ProjectFormProps> = (props) => {
   const [openFile, setOpenFile] = useState(false)
   const [fileId, setFileId] = useState('')
 
-  function onChange(key: string, evt: any | string) {
-    let value = ''
-    if (typeof evt === 'object') {
-      // File upload
-      if (evt.target.files) {
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          value = ab2str(reader.result)
-          setState({
-            ...state,
-            [key]: value,
-          })
-        }
-        reader.readAsArrayBuffer(evt.target.files[0])
-      } else {
-        value = evt.target.value
-      }
-    } else {
-      value = evt
-    }
+  const onChange = (value: IProject) => {
+    console.log(value.name)
+    // let value = ''
+    // if (typeof evt === 'object') {
+    //   // File upload
+    //   if (evt.target.files) {
+    //     const reader = new FileReader()
+    //     reader.onloadend = () => {
+    //       value = ab2str(reader.result)
+    //       setState({
+    //         ...state,
+    //         [key]: value,
+    //       })
+    //     }
+    //     reader.readAsArrayBuffer(evt.target.files[0])
+    //   } else {
+    //     value = evt.target.value
+    //   }
+    // } else {
+    //   value = evt
+    // }
 
-    setState({
-      ...state,
-      [key]: value,
-    })
+    // setState({
+    //   ...state,
+    //   [key]: value,
+    // })
 
-    if (key === 'kdbxName') setOpenFile(false)
+    // if (key === 'kdbxName') setOpenFile(false)
+  }
+
+  const refreshUuid = () => {
+    form.setFields([{ name: 'uuid', value: nanoid() }])
   }
 
   return (
-    <>
+    <Wrapper>
+      <Form
+        form={form}
+        size="large"
+        initialValues={state}
+        layout="vertical"
+        onValuesChange={onChange}
+      >
+        <Form.Item label="UUID" name="uuid">
+          <Input
+            prefix={<ToolTwoTone />}
+            suffix={
+              !props.project && <GenerateUuidButton onClick={refreshUuid} />
+            }
+            disabled
+          />
+        </Form.Item>
+        <Form.Item label="Name" name="name">
+          <Input prefix={<TagTwoTone />} />
+        </Form.Item>
+        <Form.Item label="KDBX" name="kdbxName">
+          <Input
+            prefix={<DatabaseTwoTone />}
+            suffix={<DownloadKdbxButton />}
+            disabled
+          />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" size="large">
+            Save
+          </Button>
+        </Form.Item>
+      </Form>
       {/* <Dialog fullScreen open={open}>
         <AppBar className={classes.appBar}>
           <Toolbar>
@@ -245,7 +312,7 @@ const ProjectForm: FC<ProjectFormProps> = (props) => {
           }}
         />
       </Dialog> */}
-    </>
+    </Wrapper>
   )
 }
 

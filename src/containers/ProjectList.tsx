@@ -152,6 +152,7 @@ const ProjectList: FC = () => {
         <Button
           icon={<PlusOutlined />}
           type="primary"
+          size="large"
           onClick={() => push('/project')}
         >
           Create Project

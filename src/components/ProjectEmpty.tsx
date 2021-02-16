@@ -8,7 +8,6 @@ const Container = styled.div`
   padding: 20px;
 `
 const EmptyText = styled.label`
-  font-size: 1.25em;
   svg {
     margin-right: 10px;
   }

@@ -3,6 +3,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { Layout } from 'antd'
 import { RecoilRoot } from 'recoil'
 import styled from '@emotion/styled'
+import { Global, css } from '@emotion/react'
 import TopBar from './containers/TopBar'
 import Firebase from './containers/Firebase'
 import MainRouter from './router'
@@ -32,6 +33,17 @@ const App: FC = () => {
   return (
     <RecoilRoot>
       <Router>
+        <Global
+          styles={css`
+            html,
+            body {
+              margin: 0;
+              padding: 0;
+              font-size: 16px;
+              font-family: 'Source Sans Pro', 'Arial', 'san-serif';
+            }
+          `}
+        />
         <Firebase />
         <TopBar />
         <Shell>

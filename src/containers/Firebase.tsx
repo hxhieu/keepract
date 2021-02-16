@@ -25,11 +25,21 @@ const buildProvider = () => {
 }
 
 const logout = () => {
-  firebase.auth().signOut()
+  firebase
+    .auth()
+    .signOut()
+    .catch(({ message }: { message: string }) => {
+      messageBox.error(`${message}`, 0)
+    })
 }
 
 const login = () => {
-  firebase.auth().signInWithRedirect(buildProvider())
+  firebase
+    .auth()
+    .signInWithRedirect(buildProvider())
+    .catch(({ message }: { message: string }) => {
+      messageBox.error(`${message}`, 0)
+    })
 }
 
 const getAuth = () => firebase.auth()
