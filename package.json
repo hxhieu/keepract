@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@ant-design/colors": "^6.0.0",
+    "@ant-design/icons": "^4.5.0",
     "@craco/craco": "^6.1.1",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.1.5",

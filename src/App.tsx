@@ -1,18 +1,19 @@
 import { FC } from 'react'
+import { BrowserRouter as Router } from 'react-router-dom'
 import { Layout } from 'antd'
-import { geekblue as mainColour } from '@ant-design/colors'
 import { RecoilRoot } from 'recoil'
 import styled from '@emotion/styled'
 import TopBar from './containers/TopBar'
 import Firebase from './containers/Firebase'
 import MainRouter from './router'
+import { primaryBg, primaryBorder } from './styles'
 
 const { Content, Footer } = Layout
 
 const StickyFooter = styled(Footer)`
   text-align: center;
-  background: ${mainColour};
-  border-top: 1px solid ${mainColour[1]};
+  background: ${primaryBg};
+  border-top: 1px solid ${primaryBorder};
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -20,7 +21,7 @@ const StickyFooter = styled(Footer)`
 `
 
 const MainContent = styled(Content)`
-  padding: 10px 20px 50px 20px;
+  padding: 0px 40px 50px 40px;
 `
 
 const Shell = styled(Layout)`
@@ -30,20 +31,22 @@ const Shell = styled(Layout)`
 const App: FC = () => {
   return (
     <RecoilRoot>
-      <Firebase />
-      <TopBar />
-      <Shell>
-        <MainContent>
-          <MainRouter />
-        </MainContent>
-        <StickyFooter>
-          Mitmeo Vault &copy; {new Date().getFullYear()}
-          &nbsp;
-          <a href="https://mitmeo.studio" target="_blank">
-            mitmeo.studio
-          </a>
-        </StickyFooter>
-      </Shell>
+      <Router>
+        <Firebase />
+        <TopBar />
+        <Shell>
+          <MainContent>
+            <MainRouter />
+          </MainContent>
+          <StickyFooter>
+            Mitmeo Vault &copy; {new Date().getFullYear()}
+            &nbsp;
+            <a href="https://mitmeo.studio" target="_blank">
+              mitmeo.studio
+            </a>
+          </StickyFooter>
+        </Shell>
+      </Router>
     </RecoilRoot>
   )
 }

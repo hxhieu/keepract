@@ -9,7 +9,7 @@ const Home: FC = () => {
   return accessToken ? (
     <ProjectList />
   ) : (
-    <PageHeader>You are not logged in.</PageHeader>
+    <PageHeader title="You are not logged in." disableBack={true} />
   )
 }
 

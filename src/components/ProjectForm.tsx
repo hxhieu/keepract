@@ -1,48 +1,30 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, FC } from 'react'
+import { Form } from 'antd'
 import * as ab2str from 'arraybuffer-to-string'
 import { v4 } from 'uuid'
 import GDriveFile from './GDriveFile'
 import { IProject } from '../types'
 
-export default ({
-  project,
-  open,
-  onClose,
-  onSave,
-  onDelete,
-}: {
+interface ProjectFormProps {
   project?: IProject
-  open: boolean
-  onClose: () => void
-  onSave: (values: IProject) => void
-  onDelete: (uuid?: string) => void
-}) => {
-  // const classes = useStyles()
-  const [values, setValues] = useState({
-    uuid: '',
-    name: '',
-    kdbxFileId: '',
-    kdbxName: '',
-    credType: '',
-    password: '',
-    keyFile: '',
+  onSave: (project: IProject) => void
+  onDelete: (uuid: string) => void
+}
+
+const ProjectForm: FC<ProjectFormProps> = (props) => {
+  const { uuid, name, kdbxFileId, kdbxName, credType, password, keyFile } =
+    props.project || {}
+  const [state, setState] = useState<IProject>({
+    uuid,
+    name,
+    kdbxFileId,
+    kdbxName,
+    credType,
+    password,
+    keyFile,
   })
   const [openFile, setOpenFile] = useState(false)
   const [fileId, setFileId] = useState('')
-
-  useEffect(() => {
-    // Clear values on close
-    setValues({
-      uuid: open ? (project && project.uuid) || v4() : '',
-      name: open ? (project && project.name) || '' : '',
-      kdbxFileId: open ? (project && project.kdbxFileId) || '' : '',
-      kdbxName: open ? (project && project.kdbxName) || '' : '',
-      credType: open ? (project && project.credType) || '' : '',
-      password: open ? (project && project.password) || '' : '',
-      keyFile: open ? (project && project.keyFile) || '' : '',
-    })
-    setFileId(values.kdbxFileId)
-  }, [open, project, values.kdbxFileId])
 
   function onChange(key: string, evt: any | string) {
     let value = ''
@@ -52,8 +34,8 @@ export default ({
         const reader = new FileReader()
         reader.onloadend = () => {
           value = ab2str(reader.result)
-          setValues({
-            ...values,
+          setState({
+            ...state,
             [key]: value,
           })
         }
@@ -65,8 +47,8 @@ export default ({
       value = evt
     }
 
-    setValues({
-      ...values,
+    setState({
+      ...state,
       [key]: value,
     })
 
@@ -266,3 +248,5 @@ export default ({
     </>
   )
 }
+
+export default ProjectForm

@@ -1,4 +1,7 @@
 import React, { useState, useEffect, FC } from 'react'
+import { useHistory } from 'react-router-dom'
+import { Button } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 import styled from '@emotion/styled'
 import { produce } from 'immer'
 import ProjectEmpty from '../components/ProjectEmpty'
@@ -24,6 +27,7 @@ const Buttons = styled.div({
 })
 
 const ProjectList: FC = () => {
+  const { push } = useHistory()
   const storage = getStorage('project')
   const [projects, setProjects] = useState<IProjectList>({
     list: [],
@@ -57,7 +61,7 @@ const ProjectList: FC = () => {
     })
   }
   async function saveProject(project: IProject) {
-    await storage.setItem(project.uuid, project)
+    await storage.setItem(project.uuid as string, project)
     // Mutate the state
     setProjects(
       produce(projects, (draft) => {
@@ -109,56 +113,51 @@ const ProjectList: FC = () => {
 
   return (
     <>
-      <PageHeader>Projects</PageHeader>
       <ScreenLoader loading={loading} />
-      {/* {list.length ? (
-        <List>
-          {list.map(x => (
-            <ListItem button key={x.uuid} onClick={() => loadProject(x)}>
-              <ListItemIcon>
-                <StorageIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary={x.name}
-                secondary={
-                  !x.credType ? (
-                    <Chip component="a" label="LOCKED" size="small"></Chip>
-                  ) : (
-                    'Click to open'
-                  )
-                }
-              />
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  color="primary"
-                  aria-label="delete"
-                  onClick={() => editProject(x)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
+      {list.length ? (
+        <PageHeader title="Projects" disableBack={true} />
       ) : (
+        // <List>
+        //   {list.map((x) => (
+        //     <ListItem button key={x.uuid} onClick={() => loadProject(x)}>
+        //       <ListItemIcon>
+        //         <StorageIcon />
+        //       </ListItemIcon>
+        //       <ListItemText
+        //         primary={x.name}
+        //         secondary={
+        //           !x.credType ? (
+        //             <Chip component="a" label="LOCKED" size="small"></Chip>
+        //           ) : (
+        //             'Click to open'
+        //           )
+        //         }
+        //       />
+        //       <ListItemSecondaryAction>
+        //         <IconButton
+        //           edge="end"
+        //           color="primary"
+        //           aria-label="delete"
+        //           onClick={() => editProject(x)}
+        //         >
+        //           <EditIcon />
+        //         </IconButton>
+        //       </ListItemSecondaryAction>
+        //     </ListItem>
+        //   ))}
+        // </List>
         <ProjectEmpty />
       )}
       <Buttons>
         <Button
-          variant="contained"
-          color="primary"
-          onClick={() =>
-            setProjectForm({
-              project: undefined,
-              open: true
-            })
-          }
+          icon={<PlusOutlined />}
+          type="primary"
+          onClick={() => push('/project')}
         >
           Create Project
         </Button>
       </Buttons>
-      <ProjectForm
+      {/* <ProjectForm
         project={projectForm.project}
         open={projectForm.open}
         onClose={closeProjectForm}

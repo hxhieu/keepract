@@ -1,29 +1,28 @@
-import React from 'react'
+import React, { FC } from 'react'
+import { SmileTwoTone } from '@ant-design/icons'
 import styled from '@emotion/styled'
+import { primaryColour } from '../styles'
 
-const Container = styled.div({
-  textAlign: 'center',
-})
+const Container = styled.div`
+  text-align: center;
+  padding: 20px;
+`
+const EmptyText = styled.label`
+  font-size: 1.25em;
+  svg {
+    margin-right: 10px;
+  }
+`
 
-const EmptyText = styled.label(
-  {
-    display: 'block',
-    marginBottom: '12px',
-  },
-  (props) => ({
-    color: props.color,
-  })
-)
-
-export default () => {
-  return <div></div>
-  // const {
-  //   palette: { text }
-  // } = useTheme()
-  // return (
-  //   <Container>
-  //     <InboxIcon fontSize="large" color="disabled"></InboxIcon>
-  //     <EmptyText color={text.disabled}>You have no Project</EmptyText>
-  //   </Container>
-  // )
+const ProjectEmpty: FC = () => {
+  return (
+    <Container>
+      <EmptyText>
+        <SmileTwoTone twoToneColor={primaryColour} />
+        You have no Project
+      </EmptyText>
+    </Container>
+  )
 }
+
+export default ProjectEmpty

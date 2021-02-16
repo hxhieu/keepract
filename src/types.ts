@@ -4,8 +4,8 @@ export interface IReducerAction {
 }
 
 export interface IProject {
-  name: string
-  uuid: string
+  name?: string
+  uuid?: string
   kdbxName?: string
   kdbxFileId?: string
   credType?: string
