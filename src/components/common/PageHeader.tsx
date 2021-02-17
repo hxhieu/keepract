@@ -14,9 +14,8 @@ const Header = styled(AntPageHeader)`
   padding-right: 0;
 `
 
-const PageHeader: FC<PageHeaderProps> = (props) => {
+const PageHeader: FC<PageHeaderProps> = ({ title, disableBack }) => {
   const { goBack } = useHistory()
-  const { title, disableBack } = props
   return (
     <Header
       title={title}

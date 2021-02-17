@@ -40,7 +40,7 @@ const App: FC = () => {
               margin: 0;
               padding: 0;
               font-size: 16px;
-              font-family: 'Source Sans Pro', 'Arial', 'san-serif';
+              font-family: 'Roboto', Arial, sans-serif;
             }
           `}
         />

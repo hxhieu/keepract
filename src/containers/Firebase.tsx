@@ -54,7 +54,8 @@ const Firebase: FC = () => {
     }
 
     // Check the local token validity
-    const tokenResult = await user.getIdTokenResult()
+    // Dont refresh it because we need to refresh the access token too
+    const tokenResult = await user.getIdTokenResult(false)
     const exp = parseInt(tokenResult.claims['exp'], 10)
 
     // Token has expired
@@ -74,6 +75,8 @@ const Firebase: FC = () => {
     .then(async (result) => {
       if (result.credential) {
         const authResult = result.credential as firebase.auth.OAuthCredential
+        // We can use this API to get the access token detail, if need
+        // https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=
         setAccessToken(authResult.accessToken)
       }
     })

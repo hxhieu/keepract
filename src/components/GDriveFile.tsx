@@ -1,27 +1,19 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, FC } from 'react'
 import styled from '@emotion/styled'
-import { useAuthContext } from '../contexts/auth'
+import { Alert, List, Button } from 'antd'
+import { useRecoilValue } from 'recoil'
+import { accessTokenState } from '../state/shell'
 
-// const Container = styled(Box)({
-//   textAlign: 'center'
-// })
+interface GDriveFileProps {
+  onSelect: (name?: string, id?: string, url?: string) => void
+}
 
-// const Loader = styled(CircularProgress)`
-//   margin-top: 20px;
-// `
+const Container = styled.div`
+  text-align: center;
+`
 
-const ErrorMessage = styled.label({
-  display: 'block',
-  margin: '20px',
-})
-
-export default ({
-  onSelect,
-}: {
-  onSelect: (name: string, id: string, url?: string) => void
-}) => {
-  const { auth } = useAuthContext()
-  const { accessToken } = auth
+const GDriveFile: FC<GDriveFileProps> = ({ onSelect }) => {
+  const accessToken = useRecoilValue(accessTokenState)
   const [files, setFiles] = useState([] as gapi.client.drive.File[])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -54,27 +46,32 @@ export default ({
   }, [accessToken])
 
   return (
-    <div></div>
-    // <Container>
-    //   {loading && <Loader size={70} />}
-    //   {error ? (
-    //     <ErrorMessage>{error}</ErrorMessage>
-    //   ) : (
-    //     <List>
-    //       {files.map(({ id, name, webContentLink }) => (
-    //         <ListItem
-    //           button
-    //           key={id}
-    //           onClick={() => onSelect(name || '', id || '', webContentLink)}
-    //         >
-    //           <ListItemIcon>
-    //             <StorageIcon />
-    //           </ListItemIcon>
-    //           <ListItemText primary={name} />
-    //         </ListItem>
-    //       ))}
-    //     </List>
-    //   )}
-    // </Container>
+    <Container>
+      {error ? (
+        <Alert message={error} type="error" />
+      ) : (
+        <List
+          loading={loading && { tip: 'Getting the databases list...' }}
+          bordered
+          dataSource={files}
+          renderItem={({ name, id, webContentLink }) => (
+            <List.Item
+              actions={[
+                <Button
+                  type="default"
+                  onClick={() => onSelect(name, id, webContentLink)}
+                >
+                  Select
+                </Button>,
+              ]}
+            >
+              {name}
+            </List.Item>
+          )}
+        />
+      )}
+    </Container>
   )
 }
+
+export default GDriveFile
