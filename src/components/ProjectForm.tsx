@@ -5,14 +5,23 @@ import {
   TagTwoTone,
   DatabaseTwoTone,
   DownloadOutlined,
+  UploadOutlined,
 } from '@ant-design/icons'
-import { Form, Input, Button } from 'antd'
+import {
+  Form,
+  Input,
+  Button,
+  Modal,
+  Radio,
+  RadioChangeEvent,
+  Upload,
+} from 'antd'
 import styled from '@emotion/styled'
 import * as ab2str from 'arraybuffer-to-string'
 import { nanoid } from 'nanoid'
 import GDriveFile from './GDriveFile'
-import { IProject } from '../types'
-import { primaryBorder, primaryColour } from '../styles'
+import { CredType, IProject } from '../types'
+import { primaryColour } from '../styles'
 
 interface ProjectFormProps {
   project?: IProject
@@ -40,54 +49,56 @@ const DownloadKdbxButton = styled(DownloadOutlined)`
   ${suffixButtonStyle}
 `
 
-const ProjectForm: FC<ProjectFormProps> = (props) => {
-  const [form] = Form.useForm()
-  const { uuid, name, kdbxFileId, kdbxName, credType, password, keyFile } =
-    props.project || {}
-  const [state, setState] = useState<IProject>({
-    uuid: uuid || nanoid(),
-    name,
-    kdbxFileId,
-    kdbxName,
-    credType,
-    password,
-    keyFile,
-  })
-  const [openFile, setOpenFile] = useState(false)
-  const [fileId, setFileId] = useState('')
+const CredTypeSuppliment = styled.div`
+  margin-top: 10px;
+`
 
-  const onChange = (value: IProject) => {
-    console.log(value.name)
-    // let value = ''
-    // if (typeof evt === 'object') {
-    //   // File upload
-    //   if (evt.target.files) {
-    //     const reader = new FileReader()
-    //     reader.onloadend = () => {
-    //       value = ab2str(reader.result)
-    //       setState({
-    //         ...state,
-    //         [key]: value,
-    //       })
-    //     }
-    //     reader.readAsArrayBuffer(evt.target.files[0])
-    //   } else {
-    //     value = evt.target.value
-    //   }
-    // } else {
-    //   value = evt
-    // }
+const KeyFileUpload = styled(Upload)`
+  display: block;
+`
 
-    // setState({
-    //   ...state,
-    //   [key]: value,
-    // })
+const VerticalRadio = styled(Radio)`
+  display: block;
+  height: 30px;
+  line-height: 30px;
+`
 
-    // if (key === 'kdbxName') setOpenFile(false)
+const ProjectForm: FC<ProjectFormProps> = ({ project, onSave, onDelete }) => {
+  const [form] = Form.useForm<IProject>()
+  const intialValues = {
+    ...project,
+    uuid: (project && project.uuid) || nanoid(),
+    credType: (project && project.credType) || 'keyfile',
   }
+  const [openFile, setOpenFile] = useState<boolean>(false)
+  const [credType, setCredType] = useState<CredType>(intialValues.credType)
 
   const refreshUuid = () => {
     form.setFields([{ name: 'uuid', value: nanoid() }])
+  }
+
+  const closeBrowsePopup = () => {
+    setOpenFile(false)
+  }
+
+  const showBrowsePopup = () => {
+    setOpenFile(true)
+  }
+
+  const credTypeChanged = (e: RadioChangeEvent) => {
+    const value = e.target.value
+    setCredType(value)
+    form.setFields([
+      {
+        name: 'credType',
+        value,
+      },
+    ])
+  }
+
+  const beforeKeyUploade = (file: File) => {
+    console.log(file)
+    return false
   }
 
   return (
@@ -95,35 +106,88 @@ const ProjectForm: FC<ProjectFormProps> = (props) => {
       <Form
         form={form}
         size="large"
-        initialValues={state}
+        initialValues={intialValues}
         layout="vertical"
-        onValuesChange={onChange}
+        onFinish={onSave}
       >
-        <Form.Item label="UUID" name="uuid">
+        <Form.Item label="UUID" name="uuid" rules={[{ required: true }]}>
           <Input
             prefix={<ToolTwoTone />}
-            suffix={
-              !props.project && <GenerateUuidButton onClick={refreshUuid} />
-            }
+            suffix={!project && <GenerateUuidButton onClick={refreshUuid} />}
             disabled
           />
         </Form.Item>
-        <Form.Item label="Name" name="name">
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: 'Project name is required' }]}
+        >
           <Input prefix={<TagTwoTone />} />
         </Form.Item>
-        <Form.Item label="KDBX" name="kdbxName">
+        <Form.Item
+          label="KDBX"
+          name="kdbxName"
+          rules={[{ required: true, message: 'The database is required' }]}
+        >
           <Input
             prefix={<DatabaseTwoTone />}
-            suffix={<DownloadKdbxButton />}
+            suffix={<DownloadKdbxButton onClick={showBrowsePopup} />}
             disabled
           />
         </Form.Item>
+        <Form.Item
+          name="credType"
+          rules={[
+            { required: true, message: 'The database credential is required' },
+          ]}
+        >
+          <>
+            <Radio.Group value={credType} onChange={credTypeChanged}>
+              <VerticalRadio value="keyfile">Key file</VerticalRadio>
+              <VerticalRadio value="password">Master password</VerticalRadio>
+              <VerticalRadio value="none">Set later</VerticalRadio>
+            </Radio.Group>
+            <CredTypeSuppliment>
+              {credType === 'keyfile' && (
+                <KeyFileUpload beforeUpload={beforeKeyUploade}>
+                  <Button icon={<UploadOutlined />}>Upload key file</Button>
+                </KeyFileUpload>
+              )}
+              {credType === 'password' && <Input name="password" />}
+            </CredTypeSuppliment>
+          </>
+        </Form.Item>
+        <Form.Item hidden name="kdbxFileId">
+          <></>
+        </Form.Item>
         <Form.Item>
-          <Button type="primary" size="large">
+          <Button type="primary" htmlType="submit" size="large">
             Save
           </Button>
         </Form.Item>
       </Form>
+      <Modal
+        title="Select a database"
+        visible={openFile}
+        footer={false}
+        onCancel={closeBrowsePopup}
+      >
+        <GDriveFile
+          onSelect={(name?: string, id?: string, url?: string) => {
+            form.setFields([
+              {
+                name: 'kdbxName',
+                value: name,
+              },
+              {
+                name: 'kdbxFileId',
+                value: id,
+              },
+            ])
+            closeBrowsePopup()
+          }}
+        />
+      </Modal>
       {/* <Dialog fullScreen open={open}>
         <AppBar className={classes.appBar}>
           <Toolbar>
@@ -285,32 +349,6 @@ const ProjectForm: FC<ProjectFormProps> = (props) => {
             </Box>
           </ValidatorForm>
         </Container>
-      </Dialog> */}
-
-      {/* GDrive dialog */}
-      {/* <Dialog open={openFile} fullWidth maxWidth="sm">
-        <AppBar className={classes.appBar}>
-          <Toolbar>
-            <Typography variant="h6" className={classes.title}>
-              Select a database
-            </Typography>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="close"
-              onClick={() => setOpenFile(false)}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <GDriveFile
-          onSelect={(name: string, id: string, url?: string) => {
-            onChange('kdbxName', name)
-            // Dont know why but need separate state and cannot call onChange() twice
-            setFileId(id || '')
-          }}
-        />
       </Dialog> */}
     </Wrapper>
   )

@@ -1,3 +1,5 @@
+export type CredType = 'password' | 'keyfile' | 'none'
+
 export interface IReducerAction {
   type: string
   payload: any
@@ -8,7 +10,7 @@ export interface IProject {
   uuid?: string
   kdbxName?: string
   kdbxFileId?: string
-  credType?: string
+  credType?: CredType
   password?: string
   keyFile?: string
 }

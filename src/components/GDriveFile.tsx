@@ -36,7 +36,7 @@ const GDriveFile: FC<GDriveFileProps> = ({ onSelect }) => {
       } catch (err) {
         // Token expired
         if (err.status && err.status > 400 && err.status < 500) {
-          setError('Your token is expired, please relog')
+          setError('Your access has expired, please relog')
         }
       } finally {
         setLoading(false)

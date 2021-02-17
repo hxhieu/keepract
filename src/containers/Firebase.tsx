@@ -77,6 +77,7 @@ const Firebase: FC = () => {
         const authResult = result.credential as firebase.auth.OAuthCredential
         // We can use this API to get the access token detail, if need
         // https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=
+        // TODO: Store access token time so we can relog on expired
         setAccessToken(authResult.accessToken)
       }
     })
