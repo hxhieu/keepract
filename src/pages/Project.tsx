@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import React, { FC } from 'react'
 import PageHeader from '../components/common/PageHeader'
 import ProjectForm from '../components/ProjectForm'
 import { IProject } from '../types'

@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import React, { FC } from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Layout } from 'antd'
 import { RecoilRoot } from 'recoil'

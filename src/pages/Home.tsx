@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import React, { FC } from 'react'
 import { useRecoilValue } from 'recoil'
 import { accessTokenState } from '../state/shell'
 import ProjectList from '../containers/ProjectList'

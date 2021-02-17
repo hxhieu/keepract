@@ -8,8 +8,8 @@ import { accessTokenState } from '../state/shell'
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
-  appId: process.env.REACT_APP_FIRE_APP_ID,
-  apiKey: process.env.REACT_APP_FIRE_API_KEY,
+  appId: import.meta.env.VITE_FIRE_APP_ID,
+  apiKey: import.meta.env.VITE_FIRE_API_KEY,
   authDomain: 'keepract.firebaseapp.com',
   databaseURL: 'https://keepract.firebaseio.com',
   projectId: 'keepract',

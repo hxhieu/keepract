@@ -1,8 +1,8 @@
+import React,{ FC } from 'react'
 import { PageHeader as AntPageHeader } from 'antd'
 import { ArrowLeftOutlined as BackIcon } from '@ant-design/icons'
 import { useHistory } from 'react-router-dom'
 import styled from '@emotion/styled'
-import { FC } from 'react'
 
 interface PageHeaderProps {
   title: string
