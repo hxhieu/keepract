@@ -14,7 +14,7 @@ const Container = styled.div`
 
 const GDriveFile: FC<GDriveFileProps> = ({ onSelect }) => {
   const accessToken = useRecoilValue(accessTokenState)
-  const [files, setFiles] = useState([] as gapi.client.drive.File[])
+  const [files, setFiles] = useState<gapi.client.drive.File[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
