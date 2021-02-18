@@ -15,10 +15,8 @@ import {
   Radio,
   RadioChangeEvent,
   Upload,
-  Result,
 } from 'antd'
 import styled from '@emotion/styled'
-import * as ab2str from 'arraybuffer-to-string'
 import { nanoid } from 'nanoid'
 import GDriveFile from './GDriveFile'
 import { CredType, IProject } from '../types'
@@ -57,6 +55,17 @@ const KeyFileUpload = styled(Upload)`
 const RadioGroup = styled.div`
   .ant-form-item {
     margin-bottom: 10px;
+  }
+`
+
+const KeyFileWrapper = styled.div`
+  div:nth-of-type(1) {
+    margin-bottom: 0;
+  }
+  div:nth-of-type(2) {
+    .ant-form-item-control-input {
+      min-height: 0;
+    }
   }
 `
 
@@ -173,23 +182,43 @@ const ProjectForm: FC<ProjectFormProps> = ({ project, onSave, onDelete }) => {
             </Radio.Group>
           </Form.Item>
         </RadioGroup>
-        <Form.Item hidden={credType !== 'keyfile'}>
-          <KeyFileUpload beforeUpload={beforeKeyUploade} accept=".key">
-            <Button icon={<UploadOutlined />}>Upload key file</Button>
-          </KeyFileUpload>
-        </Form.Item>
-        <Form.Item hidden={credType !== 'password'} name="password">
+        <KeyFileWrapper>
+          <Form.Item hidden={credType !== 'keyfile'}>
+            <KeyFileUpload beforeUpload={beforeKeyUploade} accept=".key">
+              <Button icon={<UploadOutlined />}>Upload key file</Button>
+            </KeyFileUpload>
+          </Form.Item>
+          <Form.Item
+            hidden={credType !== 'keyfile'}
+            name="keyFile"
+            rules={[
+              {
+                required: credType === 'keyfile',
+                message: 'The key file is required',
+              },
+            ]}
+          >
+            <></>
+          </Form.Item>
+        </KeyFileWrapper>
+        <Form.Item
+          hidden={credType !== 'password'}
+          name="password"
+          rules={[
+            {
+              required: credType === 'password',
+              message: 'The master password is required',
+            },
+          ]}
+        >
           <Input type="password" />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit" size="large">
-            Save
+            {project ? 'Update' : 'Create'}
           </Button>
         </Form.Item>
         <Form.Item hidden name="kdbxFileId">
-          <></>
-        </Form.Item>
-        <Form.Item hidden name="keyFile">
           <></>
         </Form.Item>
       </Form>

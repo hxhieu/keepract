@@ -60,21 +60,6 @@ const ProjectList: FC = () => {
       open: false,
     })
   }
-  async function saveProject(project: IProject) {
-    await storage.setItem(project.uuid as string, project)
-    // Mutate the state
-    setProjects(
-      produce(projects, (draft) => {
-        const matchIdx = draft.list.findIndex((x) => x.uuid === project.uuid)
-        if (matchIdx >= 0) {
-          draft.list[matchIdx] = { ...project }
-        } else {
-          draft.list.push({ ...project })
-        }
-      })
-    )
-    closeProjectForm()
-  }
 
   async function deleteProject(uuid?: string) {
     if (!uuid) return
@@ -158,14 +143,8 @@ const ProjectList: FC = () => {
           Create Project
         </Button>
       </Buttons>
-      {/* <ProjectForm
-        project={projectForm.project}
-        open={projectForm.open}
-        onClose={closeProjectForm}
-        onSave={saveProject}
-        onDelete={deleteProject}
-      ></ProjectForm>
-      {project && (
+
+      {/* {project && (
         <ProjectDatabase
           project={project}
           onClose={() => setProject(undefined)}
