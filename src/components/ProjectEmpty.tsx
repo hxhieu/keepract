@@ -5,7 +5,7 @@ import { primaryColour } from '../styles'
 
 const Container = styled.div`
   text-align: center;
-  padding: 20px;
+  padding-top: 20px;
 `
 const EmptyText = styled.label`
   svg {

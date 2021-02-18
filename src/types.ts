@@ -1,4 +1,4 @@
-export type CredType = 'password' | 'keyfile' | 'none'
+export type CredType = 'password' | 'keyfile' | 'none' | undefined
 
 export interface IReducerAction {
   type: string

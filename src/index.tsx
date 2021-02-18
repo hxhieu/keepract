@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { RecoilRoot } from 'recoil'
 // import * as Sentry from '@sentry/browser'
 import App from './App'
 
@@ -11,5 +12,10 @@ import App from './App'
 gapi.load('client', async () => {
   // Load more GAPI clients
   await gapi.client.load('drive', 'v3')
-  ReactDOM.render(<App />, document.getElementById('root'))
+  ReactDOM.render(
+    <RecoilRoot>
+      <App />
+    </RecoilRoot>,
+    document.getElementById('root')
+  )
 })

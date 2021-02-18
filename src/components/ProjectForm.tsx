@@ -6,6 +6,7 @@ import {
   DatabaseTwoTone,
   DownloadOutlined,
   UploadOutlined,
+  LockTwoTone,
 } from '@ant-design/icons'
 import {
   Form,
@@ -15,6 +16,7 @@ import {
   Radio,
   RadioChangeEvent,
   Upload,
+  Popconfirm,
 } from 'antd'
 import styled from '@emotion/styled'
 import { nanoid } from 'nanoid'
@@ -25,7 +27,8 @@ import { primaryColour } from '../styles'
 interface ProjectFormProps {
   project?: IProject
   onSave: (project: IProject) => void
-  onDelete: (uuid: string) => void
+  onDelete: (uuid?: string) => void
+  onCancel: () => void
 }
 
 const suffixButtonStyle = `
@@ -69,15 +72,36 @@ const KeyFileWrapper = styled.div`
   }
 `
 
-const ProjectForm: FC<ProjectFormProps> = ({ project, onSave, onDelete }) => {
+const Buttons = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
+const ProjectForm: FC<ProjectFormProps> = ({
+  project,
+  onSave,
+  onDelete,
+  onCancel,
+}) => {
   const [form] = Form.useForm<IProject>()
-  const intialValues = {
-    ...project,
-    uuid: (project && project.uuid) || nanoid(),
-    credType: (project && project.credType) || 'keyfile',
+  const intialValues: IProject = {
+    uuid: nanoid(),
+    credType: 'keyfile',
   }
   const [openFile, setOpenFile] = useState<boolean>(false)
   const [credType, setCredType] = useState<CredType>(intialValues.credType)
+
+  useEffect(() => {
+    if (project) {
+      form.setFields(
+        Object.keys(project).map((x) => ({
+          name: x,
+          value: (project as any)[x],
+        }))
+      )
+      setCredType(project.credType)
+    }
+  }, [project])
 
   const refreshUuid = () => {
     form.setFields([{ name: 'uuid', value: nanoid() }])
@@ -177,7 +201,7 @@ const ProjectForm: FC<ProjectFormProps> = ({ project, onSave, onDelete }) => {
           >
             <Radio.Group value={credType} onChange={credTypeChanged}>
               <Radio value="keyfile">Key file</Radio>
-              <Radio value="password">Master password</Radio>
+              <Radio value="password">Password</Radio>
               <Radio value="none">Set later</Radio>
             </Radio.Group>
           </Form.Item>
@@ -211,12 +235,32 @@ const ProjectForm: FC<ProjectFormProps> = ({ project, onSave, onDelete }) => {
             },
           ]}
         >
-          <Input type="password" />
+          <Input type="password" prefix={<LockTwoTone />} />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" size="large">
-            {project ? 'Update' : 'Create'}
-          </Button>
+          <Buttons>
+            <div>
+              <Button type="primary" htmlType="submit" size="large">
+                {project ? 'Update' : 'Create'}
+              </Button>
+              <Button type="link" size="large" onClick={onCancel}>
+                Cancel
+              </Button>
+            </div>
+            {project && (
+              <Popconfirm
+                title="Delete the Project?"
+                onConfirm={() => onDelete(project && project.uuid)}
+                okText="Yes"
+                cancelText="No"
+                placement="leftBottom"
+              >
+                <Button type="primary" danger size="large">
+                  Delete
+                </Button>
+              </Popconfirm>
+            )}
+          </Buttons>
         </Form.Item>
         <Form.Item hidden name="kdbxFileId">
           <></>
