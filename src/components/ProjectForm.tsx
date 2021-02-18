@@ -15,6 +15,7 @@ import {
   Radio,
   RadioChangeEvent,
   Upload,
+  Result,
 } from 'antd'
 import styled from '@emotion/styled'
 import * as ab2str from 'arraybuffer-to-string'
@@ -49,18 +50,14 @@ const DownloadKdbxButton = styled(DownloadOutlined)`
   ${suffixButtonStyle}
 `
 
-const CredTypeSuppliment = styled.div`
-  margin-top: 10px;
-`
-
 const KeyFileUpload = styled(Upload)`
   display: block;
 `
 
-const VerticalRadio = styled(Radio)`
-  display: block;
-  height: 30px;
-  line-height: 30px;
+const RadioGroup = styled.div`
+  .ant-form-item {
+    margin-bottom: 10px;
+  }
 `
 
 const ProjectForm: FC<ProjectFormProps> = ({ project, onSave, onDelete }) => {
@@ -86,7 +83,7 @@ const ProjectForm: FC<ProjectFormProps> = ({ project, onSave, onDelete }) => {
   }
 
   const credTypeChanged = (e: RadioChangeEvent) => {
-    const value = e.target.value
+    const value: CredType = e.target.value
     setCredType(value)
     form.setFields([
       {
@@ -96,8 +93,32 @@ const ProjectForm: FC<ProjectFormProps> = ({ project, onSave, onDelete }) => {
     ])
   }
 
+  const selectKdbx = (name?: string, id?: string, url?: string) => {
+    form.setFields([
+      {
+        name: 'kdbxName',
+        value: name,
+      },
+      {
+        name: 'kdbxFileId',
+        value: id,
+      },
+    ])
+    closeBrowsePopup()
+  }
+
   const beforeKeyUploade = (file: File) => {
-    console.log(file)
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const blob = reader.result as string
+      form.setFields([
+        {
+          name: 'keyFile',
+          value: btoa(blob),
+        },
+      ])
+    }
+    reader.readAsText(file)
     return false
   }
 
@@ -135,35 +156,41 @@ const ProjectForm: FC<ProjectFormProps> = ({ project, onSave, onDelete }) => {
             disabled
           />
         </Form.Item>
-        <Form.Item
-          name="credType"
-          rules={[
-            { required: true, message: 'The database credential is required' },
-          ]}
-        >
-          <>
+        <RadioGroup>
+          <Form.Item
+            name="credType"
+            rules={[
+              {
+                required: true,
+                message: 'The database credential is required',
+              },
+            ]}
+          >
             <Radio.Group value={credType} onChange={credTypeChanged}>
-              <VerticalRadio value="keyfile">Key file</VerticalRadio>
-              <VerticalRadio value="password">Master password</VerticalRadio>
-              <VerticalRadio value="none">Set later</VerticalRadio>
+              <Radio value="keyfile">Key file</Radio>
+              <Radio value="password">Master password</Radio>
+              <Radio value="none">Set later</Radio>
             </Radio.Group>
-            <CredTypeSuppliment>
-              {credType === 'keyfile' && (
-                <KeyFileUpload beforeUpload={beforeKeyUploade}>
-                  <Button icon={<UploadOutlined />}>Upload key file</Button>
-                </KeyFileUpload>
-              )}
-              {credType === 'password' && <Input name="password" />}
-            </CredTypeSuppliment>
-          </>
+          </Form.Item>
+        </RadioGroup>
+        <Form.Item hidden={credType !== 'keyfile'}>
+          <KeyFileUpload beforeUpload={beforeKeyUploade} accept=".key">
+            <Button icon={<UploadOutlined />}>Upload key file</Button>
+          </KeyFileUpload>
         </Form.Item>
-        <Form.Item hidden name="kdbxFileId">
-          <></>
+        <Form.Item hidden={credType !== 'password'} name="password">
+          <Input type="password" />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit" size="large">
             Save
           </Button>
+        </Form.Item>
+        <Form.Item hidden name="kdbxFileId">
+          <></>
+        </Form.Item>
+        <Form.Item hidden name="keyFile">
+          <></>
         </Form.Item>
       </Form>
       <Modal
@@ -172,184 +199,8 @@ const ProjectForm: FC<ProjectFormProps> = ({ project, onSave, onDelete }) => {
         footer={false}
         onCancel={closeBrowsePopup}
       >
-        <GDriveFile
-          onSelect={(name?: string, id?: string, url?: string) => {
-            form.setFields([
-              {
-                name: 'kdbxName',
-                value: name,
-              },
-              {
-                name: 'kdbxFileId',
-                value: id,
-              },
-            ])
-            closeBrowsePopup()
-          }}
-        />
+        <GDriveFile onSelect={selectKdbx} />
       </Modal>
-      {/* <Dialog fullScreen open={open}>
-        <AppBar className={classes.appBar}>
-          <Toolbar>
-            <Typography variant="h6" className={classes.title}>
-              {project ? 'Edit Project' : 'Create Project'}
-            </Typography>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="close"
-              onClick={onClose}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <Container maxWidth="md">
-          <ValidatorForm
-            onSubmit={() => onSave({ ...values, kdbxFileId: fileId })}
-          >
-            <TextValidator
-              value={values.uuid}
-              validators={['required']}
-              errorMessages={['This field is required']}
-              fullWidth
-              label="ID"
-              name="uuid"
-              margin="normal"
-              InputProps={{
-                disabled: true,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FingerprintIcon />
-                  </InputAdornment>
-                ),
-                endAdornment: !project && (
-                  <InputAdornment position="start">
-                    <RefreshIcon
-                      className={classes.clickable}
-                      onClick={() => onChange('uuid', v4())}
-                    />
-                  </InputAdornment>
-                )
-              }}
-            />
-            <TextValidator
-              value={values.name}
-              onChange={evt => onChange('name', evt)}
-              validators={['required']}
-              errorMessages={['This field is required']}
-              fullWidth
-              label="Name"
-              name="name"
-              margin="normal"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SubjectIcon />
-                  </InputAdornment>
-                )
-              }}
-            />
-            <TextValidator
-              value={values.kdbxName}
-              onChange={evt => onChange('kdbxFileId', evt)}
-              validators={['required']}
-              errorMessages={['This field is required']}
-              fullWidth
-              label="KDBX"
-              name="kdbxName"
-              margin="normal"
-              InputProps={{
-                disabled: true,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <StorageIcon />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="start">
-                    <DownloadIcon
-                      className={classes.clickable}
-                      onClick={() => setOpenFile(true)}
-                    />
-                  </InputAdornment>
-                )
-              }}
-            />
-            <FormControl className={classes.formControl} fullWidth>
-              <FormLabel className={classes.formLabel}>
-                Credentials Type
-              </FormLabel>
-              <RadioGroup
-                aria-label="cred-type"
-                className={classes.credType}
-                name="credType"
-                value={values.credType}
-                onChange={evt => onChange('credType', evt)}
-              >
-                <FormControlLabel
-                  value=""
-                  control={<Radio />}
-                  label="Set Later"
-                />
-                <FormControlLabel
-                  value="key-file"
-                  control={<Radio />}
-                  label="Key File"
-                />
-                <FormControlLabel
-                  value="password"
-                  control={<Radio />}
-                  label="Password"
-                />
-              </RadioGroup>
-            </FormControl>
-            {values.credType === 'key-file' && (
-              <FormControl className={classes.formControl} fullWidth>
-                <FormLabel className={classes.formLabel}>Key File</FormLabel>
-                <Input
-                  fullWidth
-                  type="file"
-                  onChange={evt => onChange('keyFile', evt)}
-                ></Input>
-              </FormControl>
-            )}
-            {values.credType === 'password' && (
-              <TextValidator
-                value={values.password}
-                type="password"
-                onChange={evt => onChange('password', evt)}
-                errorMessages={['This field is required']}
-                fullWidth
-                label="Password"
-                name="password"
-                margin="normal"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <KeyIcon />
-                    </InputAdornment>
-                  )
-                }}
-              />
-            )}
-            <Box className={classes.actions}>
-              {project && (
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => onDelete(project && project.uuid)}
-                >
-                  Delete
-                </Button>
-              )}
-              <Button variant="contained" color="primary" type="submit">
-                Save
-              </Button>
-            </Box>
-          </ValidatorForm>
-        </Container>
-      </Dialog> */}
     </Wrapper>
   )
 }
