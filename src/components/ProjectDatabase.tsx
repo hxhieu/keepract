@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import * as str2ab from 'string-to-arraybuffer'
-import { IProject } from '../types'
+import { ProjectInfo } from '../types'
 import { Credentials, Kdbx, Group } from 'kdbxweb'
 import KdbxGroupPopup from './kdbx/KdbxGroupPopup'
 
@@ -11,14 +11,14 @@ interface IGroupList {
 
 export default ({
   project,
-  onClose
+  onClose,
 }: {
-  project: IProject
+  project: ProjectInfo
   onClose: () => void
 }) => {
   const [groups, setGroups] = useState<IGroupList>({
     loading: true,
-    list: undefined
+    list: undefined,
   })
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default ({
       try {
         const response = await gapi.client.drive.files.get({
           fileId,
-          alt: 'media'
+          alt: 'media',
         })
 
         const dbBuff = str2ab(response.body)
@@ -42,7 +42,7 @@ export default ({
         const db = await Kdbx.load(dbBuff, cred)
         setGroups({
           loading: false,
-          list: db.groups
+          list: db.groups,
         })
       } catch (err) {
         alert(JSON.stringify(err))

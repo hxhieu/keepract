@@ -1,11 +1,6 @@
 export type CredType = 'password' | 'keyfile' | 'none' | undefined
 
-export interface IReducerAction {
-  type: string
-  payload: any
-}
-
-export interface IProject {
+export interface ProjectInfo {
   name?: string
   uuid?: string
   kdbxName?: string

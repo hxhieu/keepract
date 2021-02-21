@@ -21,12 +21,12 @@ import {
 import styled from '@emotion/styled'
 import { nanoid } from 'nanoid'
 import GDriveFile from './GDriveFile'
-import { CredType, IProject } from '../types'
+import { CredType, ProjectInfo } from '../types'
 import { primaryColour } from '../styles'
 
 interface ProjectFormProps {
-  project?: IProject
-  onSave: (project: IProject) => void
+  project?: ProjectInfo
+  onSave: (project: ProjectInfo) => void
   onDelete: (uuid?: string) => void
   onCancel: () => void
 }
@@ -83,8 +83,8 @@ const ProjectForm: FC<ProjectFormProps> = ({
   onDelete,
   onCancel,
 }) => {
-  const [form] = Form.useForm<IProject>()
-  const intialValues: IProject = {
+  const [form] = Form.useForm<ProjectInfo>()
+  const intialValues: ProjectInfo = {
     uuid: nanoid(),
     credType: 'keyfile',
   }

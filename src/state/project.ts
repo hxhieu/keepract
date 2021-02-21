@@ -1,7 +1,7 @@
 import { atom } from 'recoil'
-import { IProject } from '../types'
+import { ProjectInfo } from '../types'
 
-const projectListState = atom<IProject[]>({
+const projectListState = atom<ProjectInfo[]>({
   key: 'projectListState',
   default: [],
 })

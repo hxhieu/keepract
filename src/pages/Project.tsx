@@ -1,10 +1,10 @@
 import React, { FC, useEffect, useState } from 'react'
-import { useRouteMatch, useHistory } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
 import { message } from 'antd'
 import PageHeader from '../components/common/PageHeader'
 import ProjectForm from '../components/ProjectForm'
-import { IProject } from '../types'
+import { ProjectInfo } from '../types'
 import { getStorage } from '../storage'
 import produce from 'immer'
 import { projectListState } from '../state/project'
@@ -16,11 +16,9 @@ interface ProjectRouteParams {
 const Project: FC = () => {
   const storage = getStorage('project')
 
-  const {
-    params: { uuid },
-  } = useRouteMatch<ProjectRouteParams>()
+  const { uuid } = useParams<ProjectRouteParams>()
   const { push } = useHistory()
-  const [project, setProject] = useState<IProject>()
+  const [project, setProject] = useState<ProjectInfo>()
   const [projects, setProjects] = useRecoilState(projectListState)
 
   useEffect(() => {
@@ -30,7 +28,7 @@ const Project: FC = () => {
     }
   }, [projects, uuid])
 
-  const onSave = async (project: IProject) => {
+  const onSave = async (project: ProjectInfo) => {
     // Clean up extra details
     switch (project.credType) {
       case 'keyfile':

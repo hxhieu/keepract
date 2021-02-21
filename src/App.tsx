@@ -8,7 +8,7 @@ import TopBar from './containers/TopBar'
 import Firebase from './containers/Firebase'
 import MainRouter from './router'
 import { primaryBg, primaryBorder } from './styles'
-import { IProject } from './types'
+import { ProjectInfo } from './types'
 import { projectListState } from './state/project'
 import { getStorage } from './storage'
 
@@ -40,9 +40,9 @@ const App: FC = () => {
   useEffect(() => {
     const loadProjects = async () => {
       const keys = await storage.keys()
-      const allProjects: IProject[] = []
+      const allProjects: ProjectInfo[] = []
       for (const x of keys) {
-        const project = (await storage.getItem(x)) as IProject
+        const project = (await storage.getItem(x)) as ProjectInfo
         if (project) {
           allProjects.push(project)
         }

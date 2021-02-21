@@ -11,7 +11,7 @@ import styled from '@emotion/styled'
 import { produce } from 'immer'
 import ProjectEmpty from '../components/ProjectEmpty'
 import { getStorage } from '../storage'
-import { IProject } from '../types'
+import { ProjectInfo } from '../types'
 import PageHeader from '../components/common/PageHeader'
 import { projectListState } from '../state/project'
 
@@ -50,7 +50,7 @@ const ProjectList: FC = () => {
                   <Button
                     type="default"
                     shape="circle"
-                    onClick={() => push(`/project/${uuid}`)}
+                    onClick={() => push(`/project/${uuid}/entry`)}
                     icon={<FolderOpenTwoTone />}
                   ></Button>,
                   <Button
