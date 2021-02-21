@@ -97,7 +97,7 @@ const Project: FC = () => {
 
   return (
     <>
-      <PageHeader title={project ? 'Edit Project' : 'Create Project'} />
+      <PageHeader title={project ? `Edit ${project.name}` : 'Create Project'} />
       <ProjectForm
         onSave={onSave}
         onDelete={onDelete}

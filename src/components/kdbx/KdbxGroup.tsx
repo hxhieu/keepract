@@ -1,96 +1,78 @@
-import React, { useState } from 'react'
-import { Group, Entry } from 'kdbxweb'
-import KdbxGroupIcon from './KdbxGroupIcon'
-import KdbxEntry from './KdbxEntry'
-import KdbxEntryDetails from './KdbxEntryDetails'
-import KdbxGroupPopup from './KdbxGroupPopup'
+import { Entry, Group } from 'kdbxweb'
+import React, { FC, useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { Button, List } from 'antd'
+import {
+  FolderOpenTwoTone,
+  FolderTwoTone,
+  LockTwoTone,
+} from '@ant-design/icons'
+import PageHeader from '../common/PageHeader'
+import styled from '@emotion/styled'
 
-interface IEntryForm {
-  entry?: Entry
-  open: boolean
+interface KdbxGroupProps {
+  group?: Group
 }
 
-export default ({ group }: { group: Group }) => {
-  const [entryForm, setEntryForm] = useState<IEntryForm>({
-    entry: undefined,
-    open: false,
-  })
-  const [subGroup, setSubgroup] = useState<Group>()
+interface KdbxItem {
+  name: string
+  notes?: string
+  uuid?: string
+  isGroup: boolean
+}
 
+const Wrapper = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+`
+
+const KdbxGroup: FC<KdbxGroupProps> = ({ group }) => {
+  if (!group) return <h2>Invalid group</h2>
   const { groups, entries } = group
-  const { entry, open } = entryForm
+  const items: KdbxItem[] = []
+
+  groups.forEach((x) => {
+    items.push({
+      name: x.name as string,
+      uuid: x.uuid.id,
+      isGroup: true,
+    })
+  })
+
+  entries.forEach((x) => {
+    const { fields, uuid } = x
+    const { Title, Notes } = fields
+    items.push({
+      name: Title as string,
+      notes: Notes as string,
+      uuid: uuid.id,
+      isGroup: false,
+    })
+  })
+
   return (
-    <>
-      {/* <List>
-        {groups &&
-          groups.map(x => (
-            <ListItem button key={x.uuid.id} onClick={() => setSubgroup(x)}>
-              <ListItemIcon>
-                <KdbxGroupIcon idx={x.icon} />
-              </ListItemIcon>
-              <ListItemText
-                primary={x.name}
-                secondary={
-                  <>
-                    {x.entries.length > 0 && (
-                      <Chip
-                        avatar={
-                          <Avatar component="span">
-                            <KeyIcon />
-                          </Avatar>
-                        }
-                        color="primary"
-                        component="a"
-                        label={x.entries.length}
-                        size="small"
-                      ></Chip>
-                    )}
-                    {x.groups.length > 0 && (
-                      <Chip
-                        avatar={
-                          <Avatar component="span">
-                            <FolderIcon />
-                          </Avatar>
-                        }
-                        component="a"
-                        label={x.groups.length}
-                        size="small"
-                      ></Chip>
-                    )}
-                  </>
-                }
-              />
-            </ListItem>
-          ))}
-        {entries &&
-          entries.map(x => (
-            <KdbxEntry
-              entry={x}
-              key={x.uuid.id}
-              onSelect={entry =>
-                setEntryForm({
-                  entry,
-                  open: true
-                })
-              }
+    <Wrapper>
+      <List
+        bordered
+        dataSource={items}
+        renderItem={({ name, uuid, isGroup, notes }) => (
+          <List.Item
+            actions={[
+              <Button type="default" icon={<FolderOpenTwoTone />}>
+                Open
+              </Button>,
+            ]}
+          >
+            <List.Item.Meta
+              avatar={isGroup ? <FolderTwoTone /> : <LockTwoTone />}
+              description={notes}
+              title={name}
             />
-          ))}
-      </List>
-      <KdbxEntryDetails
-        open={open}
-        entry={entry}
-        onClose={() => {
-          setEntryForm({
-            entry: undefined,
-            open: false
-          })
-        }}
+          </List.Item>
+        )}
       />
-      <KdbxGroupPopup
-        open={!!subGroup}
-        group={subGroup}
-        onClose={() => setSubgroup(undefined)}
-      /> */}
-    </>
+    </Wrapper>
   )
 }
+
+export default KdbxGroup
