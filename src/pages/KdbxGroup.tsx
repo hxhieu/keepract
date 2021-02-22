@@ -54,8 +54,6 @@ const KdbxGroup: FC = () => {
   const { uuid, groupIds } = useParams<KdbxGroupRouteParams>()
   const { url } = useRouteMatch()
   const { push } = useHistory()
-  const { state } = useLocation<KdbxGroupRouteState>()
-  const parent = state && state.parent
 
   const [items, setItems] = useState<KdbxItem[]>([])
   const [project, setProject] = useState<ProjectInfo>()
@@ -78,11 +76,7 @@ const KdbxGroup: FC = () => {
 
   useEffect(() => {
     if (!group) return
-    const currentGroup = parent
-      ? parent.groups.find((x) => x.uuid.id === uuid)
-      : group
-    console.log(currentGroup)
-    const { groups, entries } = currentGroup || {}
+    const { groups, entries } = group
     const temp: KdbxItem[] = []
     if (groups)
       groups.forEach((x) => {

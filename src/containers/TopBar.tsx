@@ -24,7 +24,7 @@ const Header = styled(PageHeader)`
 `
 
 const TopBar = () => {
-  const { push } = useHistory()
+  const { push, replace } = useHistory()
   const [user, loading, error] = useAuthState(getAuth())
   const [accessToken, setAccessToken] = useRecoilState(accessTokenState)
   const [startAuth, setStartAuth] = useState<boolean>(false)
@@ -32,7 +32,8 @@ const TopBar = () => {
 
   const handleLoginOutButton = () => {
     if (accessToken) {
-      setAccessToken(undefined)
+      setAccessToken('')
+      replace('/')
       logout()
     } else {
       setStartAuth(true)
