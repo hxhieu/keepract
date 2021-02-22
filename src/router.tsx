@@ -3,15 +3,16 @@ import { Switch, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Project from './pages/Project'
 import KdbxGroup from './pages/KdbxGroup'
+import PrivateRoute from './components/common/PrivateRoute'
 
 const MainRouter = () => (
   <Switch>
-    <Route path="/project/:uuid?/group/:groupIds?">
+    <PrivateRoute path="/project/:uuid?/group/:groupIds?">
       <KdbxGroup />
-    </Route>
-    <Route path="/project/:uuid?">
+    </PrivateRoute>
+    <PrivateRoute path="/project/:uuid?">
       <Project />
-    </Route>
+    </PrivateRoute>
     <Route path="/">
       <Home />
     </Route>
