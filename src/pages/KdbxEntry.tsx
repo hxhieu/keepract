@@ -1,15 +1,12 @@
-import React from 'react'
-import { Entry } from 'kdbxweb'
+import React, { FC } from 'react'
 
-export default ({
-  entry,
-  onSelect,
-}: {
-  entry: Entry
-  onSelect: (entry: Entry) => void
-}) => {
-  const { fields } = entry
-  const { Title } = fields
+interface KdbxEntryRouteParams {
+  uuid: string
+  groupIds?: string
+  entryId: string
+}
+
+const KdbxEntry: FC = () => {
   return (
     <div></div>
     // <ListItem button onClick={() => onSelect(entry)}>
@@ -20,3 +17,5 @@ export default ({
     // </ListItem>
   )
 }
+
+export default KdbxEntry

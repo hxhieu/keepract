@@ -14,9 +14,10 @@ import { GROUP_IDS_SEPARATOR, KdbxItem, ProjectInfo } from '../types'
 import { useProjects } from '../hooks/useProject'
 import KdbxGroupBreadcrumb from '../components/KdbxGroupBreadcrumb'
 import { primaryBg } from '../styles'
+import { Group } from 'kdbxweb'
 
 interface KdbxGroupRouteParams {
-  uuid?: string
+  uuid: string
   groupIds?: string
 }
 
@@ -70,7 +71,7 @@ const KdbxGroup: FC = () => {
   useEffect(() => {
     if (!group) return
 
-    let currentGroup = group
+    let currentGroup: Group = group
     let groupLevel = 0
     const tempGroups: KdbxItem[] = []
 
@@ -123,16 +124,18 @@ const KdbxGroup: FC = () => {
   }, [group, url])
 
   const handleOpen = (uuid?: string, isGroup?: boolean) => {
+    let nextUrl = url
+    const safeId = btoa(uuid || '')
     if (isGroup) {
-      let nextUrl = url
-      const safeId = btoa(uuid || '')
       if (allGroups.length === 0) {
         nextUrl += `/${safeId}`
       } else {
         nextUrl += `${GROUP_IDS_SEPARATOR}${safeId}`
       }
-      push(nextUrl)
+    } else {
+      nextUrl += `/entry/${safeId}`
     }
+    push(nextUrl)
   }
 
   return (

@@ -4,10 +4,14 @@ import Home from './pages/Home'
 import Project from './pages/Project'
 import KdbxGroup from './pages/KdbxGroup'
 import PrivateRoute from './components/common/PrivateRoute'
+import KdbxEntry from './pages/KdbxEntry'
 
 const MainRouter = () => (
   <Switch>
-    <PrivateRoute path="/project/:uuid?/group/:groupIds?">
+    <PrivateRoute path="/project/:uuid/group/:groupIds?/entry/:entryId">
+      <KdbxEntry />
+    </PrivateRoute>
+    <PrivateRoute path="/project/:uuid/group/:groupIds?">
       <KdbxGroup />
     </PrivateRoute>
     <PrivateRoute path="/project/:uuid?">
