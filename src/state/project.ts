@@ -12,9 +12,19 @@ const projectGroupState = atom<Group | undefined>({
   default: undefined,
 })
 
-const currentProjectState = atom<string | undefined>({
+const cachedProjectState = atom<string | undefined>({
+  key: 'cachedProjectState',
+  default: undefined,
+})
+
+const currentProjectState = atom<ProjectInfo | undefined>({
   key: 'currentProjectState',
   default: undefined,
 })
 
-export { projectListState, projectGroupState, currentProjectState }
+export {
+  projectListState,
+  projectGroupState,
+  cachedProjectState,
+  currentProjectState,
+}
