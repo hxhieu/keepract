@@ -24,7 +24,6 @@
     "@types/react-router-dom": "^5.1.7",
     "@vitejs/plugin-react-refresh": "^1.1.0",
     "antd": "^4.12.3",
-    "copy-to-clipboard": "^3.3.1",
     "firebase": "^8.2.7",
     "immer": "^8.0.1",
     "kdbxweb": "^1.4.2",
