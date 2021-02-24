@@ -18,3 +18,8 @@ export interface KdbxItem {
   uuid?: string
   isGroup: boolean
 }
+
+export interface KdbxGroupRouteParams {
+  uuid: string
+  groupIds?: string
+}

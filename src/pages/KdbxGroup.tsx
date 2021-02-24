@@ -1,20 +1,15 @@
-import React, { FC, useEffect, useState } from 'react'
-import { useParams, useRouteMatch, useHistory } from 'react-router-dom'
+import React, { FC } from 'react'
+import { useRouteMatch, useHistory } from 'react-router-dom'
 import { List, message } from 'antd'
 import { FolderTwoTone, LockTwoTone } from '@ant-design/icons'
 import PageHeader from '../components/common/PageHeader'
 import styled from '@emotion/styled'
 import { useRecoilValue } from 'recoil'
-import {
-  cachedProjectState,
-  currentProjectState,
-  projectGroupState,
-  projectListState,
-} from '../state/project'
-import { GROUP_IDS_SEPARATOR, KdbxItem, ProjectInfo } from '../types'
-import { useProjects } from '../hooks/useProject'
+import { currentProjectState } from '../state/project'
+import { GROUP_IDS_SEPARATOR } from '../types'
 import KdbxGroupBreadcrumb from '../components/KdbxGroupBreadcrumb'
 import { primaryBg } from '../styles'
+import { useLoadCurrentGroup, useLoadProject } from '../hooks'
 
 const Wrapper = styled.div`
   max-width: 800px;
@@ -33,7 +28,6 @@ const KdbxGroup: FC = () => {
   const { url } = useRouteMatch()
   const { push } = useHistory()
 
-  const { useLoadProject, useLoadCurrentGroup } = useProjects()
   // Fetch and cache the project
   const loading = useLoadProject(message.error)
   // Load current group and breadcrumb
