@@ -3,6 +3,7 @@ import { Entry } from 'kdbxweb'
 import React, { FC, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useRecoilValue } from 'recoil'
+import styled from '@emotion/styled'
 import PageHeader from '../components/common/PageHeader'
 import KdbxEntryForm from '../components/KdbxEntryForm'
 import KdbxGroupBreadcrumb from '../components/KdbxGroupBreadcrumb'
@@ -10,6 +11,12 @@ import { useLoadCurrentGroup, useLoadProject } from '../hooks'
 import { currentProjectState } from '../state/project'
 import { KdbxEntryRouteParams, KdbxItem } from '../types'
 import { getKdbxFieldValue } from '../utils'
+
+const EntryFormWrapper = styled.div`
+  margin-top: 10px;
+  max-width: 800px;
+  margin: 0 auto;
+`
 
 const KdbxEntry: FC = () => {
   const project = useRecoilValue(currentProjectState)
@@ -44,7 +51,9 @@ const KdbxEntry: FC = () => {
             loadedGroups={loadedGroups}
             entry={breadcrumbEntry}
           />
-          <KdbxEntryForm entry={entry} />
+          <EntryFormWrapper>
+            <KdbxEntryForm entry={entry} />
+          </EntryFormWrapper>
         </>
       )}
     </>

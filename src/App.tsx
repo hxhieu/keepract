@@ -62,6 +62,10 @@ const App: FC = () => {
             padding: 0;
             font-size: 16px;
             font-family: 'Roboto', Arial, sans-serif;
+
+            .ant-form-item-label label {
+              font-weight: bold;
+            }
           }
         `}
       />
