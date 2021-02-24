@@ -1,7 +1,7 @@
 import React from 'react'
 import { Entry, ProtectedValue } from 'kdbxweb'
 import * as copy from 'copy-to-clipboard'
-import ScreenLoader from '../common/ScreenLoader'
+// import ScreenLoader from '../common/ScreenLoader'
 
 const getValue = (value: any) => {
   if (value instanceof ProtectedValue) {

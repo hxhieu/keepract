@@ -4,13 +4,14 @@ import { useParams, useRouteMatch } from 'react-router-dom'
 import { useRecoilValue } from 'recoil'
 import { projectGroupState } from '../state/project'
 import { GROUP_IDS_SEPARATOR, KdbxGroupRouteParams, KdbxItem } from '../types'
+import { getKdbxFieldValue } from '../utils'
 
 const buildLoadedGroups = (
-  group: Group,
+  rootGroup: Group,
   allGroups: string[],
   error?: (msg: string) => any
 ): [Group, KdbxItem[]] => {
-  let currentGroup: Group = group
+  let currentGroup: Group | undefined = rootGroup
   let groupLevel = 0
   const loadedGroups: KdbxItem[] = []
 
@@ -18,12 +19,11 @@ const buildLoadedGroups = (
   // For breadcrumb
   while (groupLevel < allGroups.length) {
     const nextId = allGroups[groupLevel]
-    const found = currentGroup.groups.find((x) => x.uuid.id === nextId)
-    if (found) {
-      currentGroup = found
+    currentGroup = currentGroup?.groups.find((x) => x.uuid.id === nextId)
+    if (currentGroup) {
       loadedGroups.push({
-        name: found.name.toString(),
-        uuid: found.uuid.id,
+        name: currentGroup.name.toString(),
+        uuid: currentGroup.uuid.id,
         isGroup: true,
       })
     } else {
@@ -34,7 +34,7 @@ const buildLoadedGroups = (
     }
     groupLevel++
   }
-  return [currentGroup, loadedGroups]
+  return [currentGroup as Group, loadedGroups]
 }
 
 const buildCurrentGroup = (currentGroup: Group): KdbxItem[] => {
@@ -55,10 +55,9 @@ const buildCurrentGroup = (currentGroup: Group): KdbxItem[] => {
       const { fields, uuid } = x
       const { Title, Notes } = fields
       items.push({
-        name: Title as string,
-        notes: Notes as string,
+        name: getKdbxFieldValue(Title),
+        notes: getKdbxFieldValue(Notes),
         uuid: uuid.id,
-        isGroup: false,
       })
     })
   return items
@@ -66,8 +65,8 @@ const buildCurrentGroup = (currentGroup: Group): KdbxItem[] => {
 
 const useLoadCurrentGroup = (
   error?: (msg: string) => any
-): [KdbxItem[], KdbxItem[]] => {
-  const group = useRecoilValue(projectGroupState)
+): [KdbxItem[], KdbxItem[], Group] => {
+  const rootGroup = useRecoilValue(projectGroupState)
 
   const { groupIds } = useParams<KdbxGroupRouteParams>()
   const { url } = useRouteMatch()
@@ -78,25 +77,27 @@ const useLoadCurrentGroup = (
 
   const [items, setItems] = useState<KdbxItem[]>([])
   const [loadedGroups, setLoadedGroups] = useState<KdbxItem[]>([])
+  const [selectedGroup, setSelectedGroup] = useState<Group>()
 
   useEffect(() => {
-    if (!group) {
+    if (!rootGroup) {
       setItems([])
       return
     }
     // Build items in the router path
     const [currentGroup, loadedGroups] = buildLoadedGroups(
-      group,
+      rootGroup,
       allGroups,
       error
     )
+    setSelectedGroup(currentGroup)
     setLoadedGroups(loadedGroups)
     // Then build all items in current path
     const items = buildCurrentGroup(currentGroup)
     setItems(items)
-  }, [group, url])
+  }, [rootGroup, url])
 
-  return [items, loadedGroups]
+  return [items, loadedGroups, selectedGroup as Group]
 }
 
 export { useLoadCurrentGroup }

@@ -16,10 +16,14 @@ export interface KdbxItem {
   name: string
   notes?: string
   uuid?: string
-  isGroup: boolean
+  isGroup?: boolean
 }
 
 export interface KdbxGroupRouteParams {
   uuid: string
   groupIds?: string
+}
+
+export interface KdbxEntryRouteParams extends KdbxGroupRouteParams {
+  entryId: string
 }
