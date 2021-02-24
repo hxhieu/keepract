@@ -1,44 +1,89 @@
-import React, { useReducer } from 'react'
-import { Router } from '@reach/router'
-import { ThemeProvider } from '@material-ui/styles'
-import { Container, CssBaseline } from '@material-ui/core'
-import { createMuiTheme } from '@material-ui/core/styles'
-import Home from './pages/Home'
+import React, { FC, useEffect } from 'react'
+import { BrowserRouter as Router } from 'react-router-dom'
+import { Layout } from 'antd'
+import { useSetRecoilState } from 'recoil'
+import styled from '@emotion/styled'
+import { Global, css } from '@emotion/react'
 import TopBar from './containers/TopBar'
-import Alert from './containers/Alert'
 import Firebase from './containers/Firebase'
-import AlertContext, { initialAlert } from './contexts/alert'
-import alertReducer from './reducers/alertReducer'
-import AuthContext, { initialAuth } from './contexts/auth'
-import authReducer from './reducers/authReducer'
-import { RouterPage } from './RouterPage'
+import MainRouter from './router'
+import { primaryBg, primaryBorder } from './styles'
+import { ProjectInfo } from './types'
+import { projectListState } from './state/project'
+import { getStorage } from './storage'
 
-const theme = createMuiTheme({
-  palette: {
-    type: 'dark'
-  }
-})
+const { Content, Footer } = Layout
 
-function App() {
-  const [alert, alertDispatch] = useReducer(alertReducer, initialAlert)
-  const [auth, authDispatch] = useReducer(authReducer, initialAuth)
+const StickyFooter = styled(Footer)`
+  text-align: center;
+  background: ${primaryBg};
+  border-top: 1px solid ${primaryBorder};
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+`
+
+const MainContent = styled(Content)`
+  padding: 0px 40px 60px 40px;
+`
+
+const Shell = styled(Layout)`
+  background: transparent;
+`
+
+const App: FC = () => {
+  const storage = getStorage('project')
+  const setProjects = useSetRecoilState(projectListState)
+
+  // Load projects at start
+  useEffect(() => {
+    const loadProjects = async () => {
+      const keys = await storage.keys()
+      const allProjects: ProjectInfo[] = []
+      for (const x of keys) {
+        const project = (await storage.getItem(x)) as ProjectInfo
+        if (project) {
+          allProjects.push(project)
+        }
+      }
+      setProjects(allProjects)
+    }
+    loadProjects()
+  }, [])
 
   return (
-    <AlertContext.Provider value={{ alert, dispatch: alertDispatch }}>
-      <AuthContext.Provider value={{ auth, dispatch: authDispatch }}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Firebase />
-          <TopBar />
-          <Container maxWidth="md">
-            <Router>
-              <RouterPage path="/" pageComponent={<Home />} />
-            </Router>
-          </Container>
-          <Alert />
-        </ThemeProvider>
-      </AuthContext.Provider>
-    </AlertContext.Provider>
+    <Router>
+      <Global
+        styles={css`
+          html,
+          body {
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+            font-family: 'Roboto', Arial, sans-serif;
+
+            .ant-form-item-label label {
+              font-weight: bold;
+            }
+          }
+        `}
+      />
+      <Firebase />
+      <TopBar />
+      <Shell>
+        <MainContent>
+          <MainRouter />
+        </MainContent>
+        <StickyFooter>
+          Mitmeo Vault &copy; {new Date().getFullYear()}
+          &nbsp;
+          <a href="https://mitmeo.studio" target="_blank">
+            mitmeo.studio
+          </a>
+        </StickyFooter>
+      </Shell>
+    </Router>
   )
 }
 

@@ -1,128 +1,105 @@
-import { useEffect } from 'react'
-import firebase, { User, auth } from 'firebase/app'
+import firebase from 'firebase/app'
 import 'firebase/auth'
-import { useAuthContext } from '../contexts/auth'
-import { getStorage } from '../storage'
 
-const ACCESS_TOKEN_KEY = 'accessToken'
-const provider = new firebase.auth.GoogleAuthProvider()
-// TODO: Restricted scope
-provider.addScope('https://www.googleapis.com/auth/drive.readonly')
+import { FC, useEffect } from 'react'
+import { useRecoilState } from 'recoil'
+import { message as messageBox } from 'antd'
+import { accessTokenState } from '../state/shell'
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
-  appId: process.env.REACT_APP_FIRE_APP_ID,
-  apiKey: process.env.REACT_APP_FIRE_API_KEY,
+  appId: import.meta.env.VITE_FIRE_APP_ID,
+  apiKey: import.meta.env.VITE_FIRE_API_KEY,
   authDomain: 'keepract.firebaseapp.com',
   databaseURL: 'https://keepract.firebaseio.com',
-  projectId: 'keepract'
+  projectId: 'keepract',
 }
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig)
 
+const buildProvider = () => {
+  const provider = new firebase.auth.GoogleAuthProvider()
+  // TODO: Restricted scope
+  provider.addScope('https://www.googleapis.com/auth/drive.readonly')
+  return provider
+}
+
+const logout = () => {
+  firebase
+    .auth()
+    .signOut()
+    .catch(({ message }: { message: string }) => {
+      messageBox.error(`${message}`, 0)
+    })
+}
+
 const login = () => {
-  firebase.auth().signInWithRedirect(provider)
-}
-const logout = async () => {
-  await getStorage('token').removeItem(ACCESS_TOKEN_KEY, undefined)
-  firebase.auth().signOut()
-}
-
-const mapUser = (firebaseUser: User) => {
-  if (!firebaseUser) return null
-  const { email } = firebaseUser
-  return { email }
+  firebase
+    .auth()
+    .signInWithRedirect(buildProvider())
+    .catch(({ message }: { message: string }) => {
+      messageBox.error(`${message}`, 0)
+    })
 }
 
-export default () => {
-  const { dispatch } = useAuthContext()
-  const tokenStore = getStorage('token')
+const getAuth = () => firebase.auth()
 
-  useEffect(() => {
-    // Temp value to deal with async
-    let accessToken: string = ''
-    // listen for auth state changes
-    const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
-      if (!user) {
-        dispatch({
-          type: 'SET_AUTH',
-          payload: {
-            initialising: false,
-            user: null,
-            accessToken: null
-          }
-        })
-        return
-      }
+const Firebase: FC = () => {
+  const [accessToken, setAccessToken] = useRecoilState(accessTokenState)
 
-      if (!accessToken) {
-        accessToken = await tokenStore.getItem(ACCESS_TOKEN_KEY)
-      }
+  // Check existing login
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (!user) {
+      return setAccessToken(undefined)
+    }
 
-      // Need new access token
-      if (!accessToken) {
-        login()
-      } else {
-        // TODO: Revalidate access token
-        // const idToken = await user.getIdToken()
-        // const credential = firebase.auth.GoogleAuthProvider.credential(
-        //   idToken,
-        //   accessToken
-        // )
-        // await user.reauthenticateWithCredential(credential)
+    // Check the local token validity
+    // Dont refresh it because we need to refresh the access token too
+    const tokenResult = await user.getIdTokenResult(false)
+    const exp = parseInt(tokenResult.claims['exp'], 10)
 
-        // Update GAPI with new tokens
-        const idToken = await user.getIdTokenResult()
-        const expiresIn = Math.floor(
-          (Date.parse(idToken.expirationTime) - new Date().getTime()) / 1000
-        )
-        gapi.auth.setToken({
-          access_token: accessToken,
-          expires_in: expiresIn.toString(),
-          error: '',
-          state: ''
-        })
-        dispatch({
-          type: 'SET_AUTH',
-          payload: {
-            initialising: false,
-            user: mapUser(user),
-            accessToken
-          }
-        })
+    // Token has expired
+    if (Date.now() > exp * 1000) {
+      // // Clean up the offline detail as the user will need to re-login
+      // logout()
+      // setAccessToken(undefined)
+      // TODO: Check if this work
+      user.reauthenticateWithRedirect(buildProvider())
+    }
+  })
+
+  // Login redirect handler
+  firebase
+    .auth()
+    .getRedirectResult()
+    .then(async (result) => {
+      if (result.credential) {
+        const authResult = result.credential as firebase.auth.OAuthCredential
+        // We can use this API to get the access token detail, if need
+        // https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=
+        // TODO: Store access token time so we can relog on expired
+        setAccessToken(authResult.accessToken)
       }
     })
+    .catch(({ message }: { message: string }) => {
+      messageBox.error(`${message}`, 0)
+    })
 
-    // Login redirect handler
-    firebase
-      .auth()
-      .getRedirectResult()
-      .then(async result => {
-        if (result.credential) {
-          // We need to store the result in a temp var because save to local storage is async
-          // and will happen AFTER the firebase onAuthStateChanged
-          accessToken = (result.credential as auth.OAuthCredential)
-            .accessToken as string
-          await tokenStore.setItem(ACCESS_TOKEN_KEY, accessToken)
-        }
+  useEffect(() => {
+    // All good, we can set the token for GAPI
+    if (accessToken) {
+      gapi.auth.setToken({
+        access_token: accessToken,
+        expires_in: '',
+        error: '',
+        state: '',
       })
-      .catch(error => {
-        // TODO: Handle errors
-        // // Handle Errors here.
-        // var errorCode = error.code
-        // var errorMessage = error.message
-        // // The email of the user's account used.
-        // var email = error.email
-        // // The firebase.auth.AuthCredential type that was used.
-        // var credential = error.credential
-        // // ...
-      })
-
-    // unsubscribe to the listener when unmounting
-    return () => unsubscribe()
-  }, [dispatch, tokenStore])
+    }
+  }, [accessToken])
 
   // This component has no presenter
   return null
 }
-export { login, logout }
+
+export default Firebase
+export { login, logout, getAuth }

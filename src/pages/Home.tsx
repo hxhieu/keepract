@@ -1,16 +1,16 @@
-import React from 'react'
+import React, { FC } from 'react'
+import { useRecoilValue } from 'recoil'
+import { accessTokenState } from '../state/shell'
 import ProjectList from '../containers/ProjectList'
-import { useAuthContext } from '../contexts/auth'
 import PageHeader from '../components/common/PageHeader'
 
-export default () => {
-  const {
-    auth: { accessToken }
-  } = useAuthContext()
-
+const Home: FC = () => {
+  const accessToken = useRecoilValue(accessTokenState)
   return accessToken ? (
     <ProjectList />
   ) : (
-    <PageHeader>Welcome to Keepract</PageHeader>
+    <PageHeader title="You are not logged in." disableBack={true} />
   )
 }
+
+export default Home

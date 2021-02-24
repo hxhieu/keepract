@@ -1,30 +1,27 @@
-import React from 'react'
-import InboxIcon from '@material-ui/icons/Inbox'
+import React, { FC } from 'react'
+import { SmileTwoTone } from '@ant-design/icons'
 import styled from '@emotion/styled'
-import { useTheme } from '@material-ui/styles'
+import { primaryColour } from '../styles'
 
-const Container = styled.div({
-  textAlign: 'center'
-})
+const Container = styled.div`
+  text-align: center;
+  padding-top: 20px;
+`
+const EmptyText = styled.label`
+  svg {
+    margin-right: 10px;
+  }
+`
 
-const EmptyText = styled.label(
-  {
-    display: 'block',
-    marginBottom: '12px'
-  },
-  props => ({
-    color: props.color
-  })
-)
-
-export default () => {
-  const {
-    palette: { text }
-  } = useTheme()
+const ProjectEmpty: FC = () => {
   return (
     <Container>
-      <InboxIcon fontSize="large" color="disabled"></InboxIcon>
-      <EmptyText color={text.disabled}>You have no Project</EmptyText>
+      <EmptyText>
+        <SmileTwoTone twoToneColor={primaryColour} />
+        You have no Project
+      </EmptyText>
     </Container>
   )
 }
+
+export default ProjectEmpty

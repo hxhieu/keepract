@@ -1,14 +1,29 @@
-export interface IReducerAction {
-  type: string
-  payload: any
-}
+export type CredType = 'password' | 'keyfile' | 'none' | undefined
 
-export interface IProject {
-  name: string
-  uuid: string
+export const GROUP_IDS_SEPARATOR = ';'
+
+export interface ProjectInfo {
+  name?: string
+  uuid?: string
   kdbxName?: string
   kdbxFileId?: string
-  credType?: string
+  credType?: CredType
   password?: string
   keyFile?: string
+}
+
+export interface KdbxItem {
+  name: string
+  notes?: string
+  uuid?: string
+  isGroup?: boolean
+}
+
+export interface KdbxGroupRouteParams {
+  uuid: string
+  groupIds?: string
+}
+
+export interface KdbxEntryRouteParams extends KdbxGroupRouteParams {
+  entryId: string
 }

@@ -1,188 +1,87 @@
-import React, { useState, useEffect } from 'react'
-import {
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListItemSecondaryAction,
-  IconButton,
-  Button,
-  Chip
-} from '@material-ui/core'
-import EditIcon from '@material-ui/icons/Edit'
-import StorageIcon from '@material-ui/icons/Storage'
+import React, { FC } from 'react'
+import { useRecoilValue } from 'recoil'
+import { useHistory } from 'react-router-dom'
+import { Button, List, Tag } from 'antd'
+import { PlusOutlined, FolderOpenTwoTone } from '@ant-design/icons'
 import styled from '@emotion/styled'
-import { produce } from 'immer'
 import ProjectEmpty from '../components/ProjectEmpty'
-import ProjectForm from '../components/ProjectForm'
-import ProjectDatabase from '../components/ProjectDatabase'
-import { getStorage } from '../storage'
-import { IProject } from '../types'
 import PageHeader from '../components/common/PageHeader'
-import ScreenLoader from '../components/common/ScreenLoader'
+import { projectListState } from '../state/project'
 
-interface IProjectForm {
-  project?: IProject
-  open: boolean
-}
+const Buttons = styled.div`
+  margin-top: 20px;
+  text-align: center;
+`
 
-interface IProjectList {
-  list: IProject[]
-  loading: boolean
-}
+const UuidTag = styled(Tag)`
+  opacity: 0.4;
+`
 
-const Buttons = styled.div({
-  textAlign: 'center'
-})
+const ListWrapper = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+`
 
-export default () => {
-  const storage = getStorage('project')
-  const [projects, setProjects] = useState<IProjectList>({
-    list: [],
-    loading: true
-  })
-  const [projectForm, setProjectForm] = useState<IProjectForm>({
-    project: undefined,
-    open: false
-  })
-  const [project, setProject] = useState<IProject | undefined>()
+const ProjectList: FC = () => {
+  const { push } = useHistory()
+  const projects = useRecoilValue(projectListState)
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      const keys = await storage.keys()
-      const projects: IProject[] = []
-      for (const x of keys) {
-        const project = (await storage.getItem(x)) as IProject
-        if (project) projects.push(project)
-      }
-
-      setProjects({ list: projects, loading: false })
-    }
-    loadProjects()
-  }, [storage])
-
-  function closeProjectForm() {
-    setProjectForm({
-      ...projectForm,
-      project: undefined,
-      open: false
-    })
+  const editProject = (uuid?: string) => {
+    push(`/project/${uuid}`)
   }
-  async function saveProject(project: IProject) {
-    await storage.setItem(project.uuid, project)
-    // Mutate the state
-    setProjects(
-      produce(projects, draft => {
-        const matchIdx = draft.list.findIndex(x => x.uuid === project.uuid)
-        if (matchIdx >= 0) {
-          draft.list[matchIdx] = { ...project }
-        } else {
-          draft.list.push({ ...project })
-        }
-      })
-    )
-    closeProjectForm()
-  }
-
-  async function deleteProject(uuid?: string) {
-    if (!uuid) return
-    await storage.removeItem(uuid)
-    // Mutate the state
-    setProjects(
-      produce(projects, draft => {
-        const matchIdx = draft.list.findIndex(x => x.uuid === uuid)
-        if (matchIdx >= 0) {
-          draft.list.splice(matchIdx, 1)
-        }
-      })
-    )
-    closeProjectForm()
-  }
-
-  function editProject(project: IProject) {
-    setProjectForm({
-      project,
-      open: true
-    })
-  }
-
-  function loadProject(project: IProject) {
-    if (!project.credType) {
-      setProjectForm({
-        project,
-        open: true
-      })
-    } else {
-      setProject(project)
-    }
-  }
-
-  const { loading, list } = projects
 
   return (
     <>
-      <PageHeader>Projects</PageHeader>
-      <ScreenLoader loading={loading} />
-      {list.length ? (
-        <List>
-          {list.map(x => (
-            <ListItem button key={x.uuid} onClick={() => loadProject(x)}>
-              <ListItemIcon>
-                <StorageIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary={x.name}
-                secondary={
-                  !x.credType ? (
-                    <Chip component="a" label="LOCKED" size="small"></Chip>
-                  ) : (
-                    'Click to open'
-                  )
-                }
-              />
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  color="primary"
-                  aria-label="delete"
-                  onClick={() => editProject(x)}
+      {projects.length > 0 ? (
+        <>
+          <PageHeader title="Projects" disableBack={true} />
+          <ListWrapper>
+            <List
+              bordered
+              dataSource={projects}
+              renderItem={({ name, uuid, kdbxName }) => (
+                <List.Item
+                  actions={[
+                    <Button
+                      type="default"
+                      onClick={() => push(`/project/${uuid}/group`)}
+                      icon={<FolderOpenTwoTone />}
+                    >
+                      Open
+                    </Button>,
+                    <Button
+                      type="link"
+                      shape="circle"
+                      onClick={() => editProject(uuid)}
+                    >
+                      Edit
+                    </Button>,
+                  ]}
                 >
-                  <EditIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
+                  <List.Item.Meta
+                    title={name}
+                    description={<UuidTag>{kdbxName}</UuidTag>}
+                  />
+                </List.Item>
+              )}
+            />
+          </ListWrapper>
+        </>
       ) : (
         <ProjectEmpty />
       )}
       <Buttons>
         <Button
-          variant="contained"
-          color="primary"
-          onClick={() =>
-            setProjectForm({
-              project: undefined,
-              open: true
-            })
-          }
+          icon={<PlusOutlined />}
+          type="primary"
+          size="large"
+          onClick={() => push('/project')}
         >
           Create Project
         </Button>
       </Buttons>
-      <ProjectForm
-        project={projectForm.project}
-        open={projectForm.open}
-        onClose={closeProjectForm}
-        onSave={saveProject}
-        onDelete={deleteProject}
-      ></ProjectForm>
-      {project && (
-        <ProjectDatabase
-          project={project}
-          onClose={() => setProject(undefined)}
-        ></ProjectDatabase>
-      )}
     </>
   )
 }
+
+export default ProjectList
