@@ -60,6 +60,7 @@
   "scripts": {
     "build": "tsc && vite build",
     "dev": "vite",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "deploy": "firebase deploy --only hosting"
   }
 }
