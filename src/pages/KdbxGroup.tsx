@@ -13,7 +13,7 @@ import { useLoadCurrentGroup, useLoadProject } from '../hooks'
 
 const Wrapper = styled.div`
   max-width: 800px;
-  margin: 10px auto;
+  margin: 0 auto;
   li.ant-list-item {
     cursor: pointer;
     &:hover {
@@ -51,22 +51,24 @@ const KdbxGroup: FC = () => {
   return (
     <>
       <PageHeader title={`Project: ${project && project.name}`} />
-      <KdbxGroupBreadcrumb project={project} loadedGroups={loadedGroups} />
       <Wrapper>
-        <List
-          bordered
-          loading={loading && { tip: 'Getting the databases...' }}
-          dataSource={items}
-          renderItem={({ name, uuid, isGroup, notes }) => (
-            <List.Item onClick={() => handleOpen(uuid, isGroup)}>
-              <List.Item.Meta
-                avatar={isGroup ? <FolderTwoTone /> : <LockTwoTone />}
-                description={notes}
-                title={name}
-              />
-            </List.Item>
-          )}
-        />
+        <>
+          <KdbxGroupBreadcrumb project={project} loadedGroups={loadedGroups} />
+          <List
+            bordered
+            loading={loading && { tip: 'Getting the databases...' }}
+            dataSource={items}
+            renderItem={({ name, uuid, isGroup, notes }) => (
+              <List.Item onClick={() => handleOpen(uuid, isGroup)}>
+                <List.Item.Meta
+                  avatar={isGroup ? <FolderTwoTone /> : <LockTwoTone />}
+                  description={notes}
+                  title={name}
+                />
+              </List.Item>
+            )}
+          />
+        </>
       </Wrapper>
     </>
   )

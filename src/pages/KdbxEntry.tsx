@@ -1,4 +1,4 @@
-import { message } from 'antd'
+import { message, Skeleton } from 'antd'
 import { Entry } from 'kdbxweb'
 import React, { FC, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -12,8 +12,7 @@ import { currentProjectState } from '../state/project'
 import { KdbxEntryRouteParams, KdbxItem } from '../types'
 import { getKdbxFieldValue } from '../utils'
 
-const EntryFormWrapper = styled.div`
-  margin-top: 10px;
+const Wrapper = styled.div`
   max-width: 800px;
   margin: 0 auto;
 `
@@ -31,31 +30,36 @@ const KdbxEntry: FC = () => {
   // Load current group and breadcrumb
   const [items, loadedGroups, currentGroup] = useLoadCurrentGroup(message.error)
 
-  useEffect(() => {
-    if (currentGroup)
-      setEntry(currentGroup.entries.find((x) => x.uuid.id === realId))
-  }, [currentGroup])
-
   const breadcrumbEntry: KdbxItem | undefined = entry && {
     name: getKdbxFieldValue(entry.fields.Title),
     uuid: entry.uuid.id,
   }
 
+  useEffect(() => {
+    if (currentGroup)
+      setEntry(currentGroup.entries.find((x) => x.uuid.id === realId))
+  }, [currentGroup])
+
+  const renderSkeleton = () => {
+    return [1, 2].map((key) => <Skeleton active key={key} />)
+  }
+
   return (
     <>
       <PageHeader title={`Project: ${project && project.name}`} />
-      {entry && (
-        <>
-          <KdbxGroupBreadcrumb
-            project={project}
-            loadedGroups={loadedGroups}
-            entry={breadcrumbEntry}
-          />
-          <EntryFormWrapper>
+      <Wrapper>
+        {loading && renderSkeleton()}
+        {entry && (
+          <>
+            <KdbxGroupBreadcrumb
+              project={project}
+              loadedGroups={loadedGroups}
+              entry={breadcrumbEntry}
+            />
             <KdbxEntryForm entry={entry} />
-          </EntryFormWrapper>
-        </>
-      )}
+          </>
+        )}
+      </Wrapper>
     </>
   )
 }

@@ -1,5 +1,6 @@
 import React, { FC } from 'react'
 import { Breadcrumb } from 'antd'
+import styled from '@emotion/styled'
 import { GROUP_IDS_SEPARATOR, KdbxItem, ProjectInfo } from '../types'
 import { Link, useRouteMatch } from 'react-router-dom'
 
@@ -8,6 +9,10 @@ interface KdbxGroupBreadcrumbProps {
   loadedGroups: KdbxItem[]
   entry?: KdbxItem
 }
+
+const Wrapper = styled.div`
+  margin-bottom: 10px;
+`
 
 const KdbxGroupBreadcrumb: FC<KdbxGroupBreadcrumbProps> = ({
   project,
@@ -30,7 +35,7 @@ const KdbxGroupBreadcrumb: FC<KdbxGroupBreadcrumbProps> = ({
   }
 
   return (
-    <>
+    <Wrapper>
       <Breadcrumb>
         <Breadcrumb.Item>
           <Link to={`/project/${project?.uuid}/group`}>{project?.name}</Link>
@@ -42,7 +47,7 @@ const KdbxGroupBreadcrumb: FC<KdbxGroupBreadcrumbProps> = ({
           </Breadcrumb.Item>
         )}
       </Breadcrumb>
-    </>
+    </Wrapper>
   )
 }
 
