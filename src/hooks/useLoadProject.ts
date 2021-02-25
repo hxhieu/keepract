@@ -2,7 +2,6 @@ import { Credentials, Kdbx, ProtectedValue } from 'kdbxweb'
 import { useEffect, useState } from 'react'
 import { useParams, useRouteMatch } from 'react-router-dom'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import * as str2ab from 'string-to-arraybuffer'
 import {
   cachedProjectState,
   currentProjectState,
@@ -10,6 +9,7 @@ import {
   projectListState,
 } from '../state/project'
 import { KdbxGroupRouteParams, ProjectInfo } from '../types'
+import { str2ab } from '../utils/str2ab'
 
 const fetchProject = async (project: ProjectInfo) => {
   const { kdbxFileId: fileId, keyFile, credType, password } = project
@@ -71,8 +71,12 @@ const useLoadProject = (error?: (msg: string) => any): boolean => {
           .catch((err) => {
             setProjectGroup(undefined)
             setCachedProjectId(undefined)
-            const body = JSON.parse(err.body)
-            error && error(body.error.message)
+            try {
+              const body = JSON.parse(err.body)
+              error && error(body.error.message)
+            } catch (parseErr) {
+              error && error(parseErr.message)
+            }
           })
           .finally(() => {
             setLoading(false)
