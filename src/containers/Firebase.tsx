@@ -56,14 +56,7 @@ const Firebase: FC = () => {
     // Check the local token validity
     // Dont refresh it because we need to refresh the access token too
     const tokenResult = await user.getIdTokenResult(false)
-    const exp = parseInt(tokenResult.claims['exp'], 10)
-
-    // Token has expired
-    if (Date.now() > exp * 1000) {
-      // // Clean up the offline detail as the user will need to re-login
-      // logout()
-      // setAccessToken(undefined)
-      // TODO: Check if this work
+    if (!tokenResult || !tokenResult.token) {
       user.reauthenticateWithRedirect(buildProvider())
     }
   })
@@ -77,7 +70,7 @@ const Firebase: FC = () => {
         const authResult = result.credential as firebase.auth.OAuthCredential
         // We can use this API to get the access token detail, if need
         // https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=
-        // TODO: Store access token time so we can relog on expired
+        // FIXME: Store access token time so we can relog on expired
         setAccessToken(authResult.accessToken)
       }
     })

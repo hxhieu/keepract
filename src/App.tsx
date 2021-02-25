@@ -5,12 +5,13 @@ import { useSetRecoilState } from 'recoil'
 import styled from '@emotion/styled'
 import { Global, css } from '@emotion/react'
 import TopBar from './containers/TopBar'
-import Firebase from './containers/Firebase'
+import Firebase, { getAuth } from './containers/Firebase'
 import MainRouter from './router'
 import { primaryBg, primaryBorder } from './styles'
 import { ProjectInfo } from './types'
 import { projectListState } from './state/project'
 import { getStorage } from './storage'
+import { useAuthState } from 'react-firebase-hooks/auth'
 
 const { Content, Footer } = Layout
 
@@ -34,12 +35,21 @@ const Shell = styled(Layout)`
 
 const App: FC = () => {
   const storage = getStorage('project')
+
+  const [user] = useAuthState(getAuth())
+
   const setProjects = useSetRecoilState(projectListState)
 
   // Load projects at start
   useEffect(() => {
     const loadProjects = async () => {
-      const keys = await storage.keys()
+      if (!user) {
+        return
+      }
+      let keys = await storage.keys()
+      // Filter by user
+      keys = keys.filter((x) => x.indexOf(user.email) === 0)
+      console.log(keys)
       const allProjects: ProjectInfo[] = []
       for (const x of keys) {
         const project = (await storage.getItem(x)) as ProjectInfo
@@ -50,7 +60,7 @@ const App: FC = () => {
       setProjects(allProjects)
     }
     loadProjects()
-  }, [])
+  }, [user])
 
   return (
     <Router>

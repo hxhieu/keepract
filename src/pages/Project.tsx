@@ -8,6 +8,8 @@ import { ProjectInfo } from '../types'
 import { getStorage } from '../storage'
 import produce from 'immer'
 import { projectListState } from '../state/project'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { getAuth } from '../containers/Firebase'
 
 interface ProjectRouteParams {
   uuid?: string
@@ -15,6 +17,7 @@ interface ProjectRouteParams {
 
 const Project: FC = () => {
   const storage = getStorage('project')
+  const [user] = useAuthState(getAuth())
 
   const { uuid } = useParams<ProjectRouteParams>()
   const { push } = useHistory()
@@ -29,6 +32,9 @@ const Project: FC = () => {
   }, [projects, uuid])
 
   const onSave = async (project: ProjectInfo) => {
+    if (!user) {
+      return message.error('Could not find your account details. Please relog.')
+    }
     // Clean up extra details
     switch (project.credType) {
       case 'keyfile':
@@ -43,8 +49,8 @@ const Project: FC = () => {
         break
     }
 
-    // FIXME: Partition by emails
-    await storage.setItem(project.uuid as string, project)
+    // Partition by user
+    await storage.setItem(`${user.email}:${project.uuid}`, project)
 
     setProject(project)
 

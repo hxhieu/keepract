@@ -12,7 +12,7 @@ const getStorage = (type: StorageType) => {
         driver: INDEXEDDB,
         name: 'keepract',
         version: 1.0,
-        storeName: type
+        storeName: type,
       })
     )
   }
