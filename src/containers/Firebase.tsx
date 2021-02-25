@@ -4,7 +4,7 @@ import 'firebase/auth'
 import { FC, useEffect } from 'react'
 import { useRecoilState } from 'recoil'
 import { message as messageBox } from 'antd'
-import { accessTokenState } from '../state/shell'
+import { accessTokenExpireState, accessTokenState } from '../state/shell'
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -46,6 +46,15 @@ const getAuth = () => firebase.auth()
 
 const Firebase: FC = () => {
   const [accessToken, setAccessToken] = useRecoilState(accessTokenState)
+  const [expire, setExpire] = useRecoilState(accessTokenExpireState)
+
+  useEffect(() => {
+    // Token has expired
+    if (expire > 0 && expire <= Date.now() / 1000) {
+      // TODO: Can we silent this...?
+      login()
+    }
+  }, [expire])
 
   // Check existing login
   firebase.auth().onAuthStateChanged(async (user) => {
@@ -68,10 +77,17 @@ const Firebase: FC = () => {
     .then(async (result) => {
       if (result.credential) {
         const authResult = result.credential as firebase.auth.OAuthCredential
+        const { accessToken } = authResult
         // We can use this API to get the access token detail, if need
-        // https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=
-        // FIXME: Store access token time so we can relog on expired
-        setAccessToken(authResult.accessToken)
+        // https://www.googleapis.com/oauth2/v2/tokeninfo?access_token=
+        const tokenInfoResult = await fetch(
+          `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`
+        )
+        const accessTokenPayload = await tokenInfoResult.json()
+        setAccessToken(accessToken)
+        const expireAt =
+          Math.floor(Date.now() / 1000) + accessTokenPayload.expires_in
+        setExpire(expireAt)
       }
     })
     .catch(({ message }: { message: string }) => {

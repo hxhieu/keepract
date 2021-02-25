@@ -12,4 +12,10 @@ const accessTokenState = atom<string | undefined>({
   effects_UNSTABLE: [persistAtom],
 })
 
-export { accessTokenState }
+const accessTokenExpireState = atom<number>({
+  key: 'accessTokenExpireState',
+  default: 0,
+  effects_UNSTABLE: [persistAtom],
+})
+
+export { accessTokenState, accessTokenExpireState }
