@@ -51,10 +51,12 @@ const Firebase: FC = () => {
   useEffect(() => {
     // Token has expired
     if (expire > 0 && expire <= Date.now() / 1000) {
-      // TODO: Can we silent this...?
+      // Set it to never expires,
+      // so after the login redirect we still can process
+      setExpire(253402261199)
       login()
     }
-  }, [expire])
+  }, [expire, setExpire])
 
   // Check existing login
   firebase.auth().onAuthStateChanged(async (user) => {
