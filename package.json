@@ -58,8 +58,8 @@
   },
   "scripts": {
     "build": "tsc && vite build",
+    "deploy": "firebase deploy --only hosting",
     "dev": "vite",
-    "serve": "vite preview",
-    "deploy": "firebase deploy --only hosting"
+    "serve": "vite preview"
   }
 }
