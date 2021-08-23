@@ -1,6 +1,6 @@
-import { ProtectedValue, StringProtected } from 'kdbxweb'
+import { KdbxEntryField, ProtectedValue } from 'kdbxweb'
 
-const getKdbxFieldValue = (value: StringProtected) => {
+const getKdbxFieldValue = (value: KdbxEntryField | undefined) => {
   if (value instanceof ProtectedValue) {
     return value.getText()
   } else {

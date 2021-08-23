@@ -48,7 +48,7 @@ const App: FC = () => {
       }
       let keys = await storage.keys()
       // Filter by user
-      keys = keys.filter((x) => x.indexOf(user.email) === 0)
+      keys = keys.filter((x) => x.indexOf(user.email || '') === 0)
       const allProjects: ProjectInfo[] = []
       for (const x of keys) {
         const project = (await storage.getItem(x)) as ProjectInfo

@@ -1,4 +1,4 @@
-import { Entry, ProtectedValue } from 'kdbxweb'
+import { KdbxEntry, ProtectedValue } from 'kdbxweb'
 import React, { FC, useEffect, useState } from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { Form, Input, InputProps, message } from 'antd'
@@ -8,7 +8,7 @@ import { CopyTwoTone } from '@ant-design/icons'
 import { primaryBg } from '../styles'
 
 interface KdbxEntryFormProps {
-  entry: Entry
+  entry: KdbxEntry
 }
 
 interface EntryField {
@@ -38,12 +38,11 @@ const KdbxEntryForm: FC<KdbxEntryFormProps> = ({ entry }) => {
 
   useEffect(() => {
     const values: EntryField[] = []
-    Object.keys(entry.fields).forEach((name) => {
-      const field = entry.fields[name]
+    entry.fields.forEach((value, name) => {
       values.push({
         name,
-        value: getKdbxFieldValue(field),
-        type: field instanceof ProtectedValue ? 'password' : 'input',
+        value: getKdbxFieldValue(value),
+        type: value instanceof ProtectedValue ? 'password' : 'input',
       })
       setFields(values)
     })
