@@ -1,4 +1,4 @@
-import { Group } from 'kdbxweb'
+import { KdbxGroup } from 'kdbxweb'
 import { atom } from 'recoil'
 import { ProjectInfo } from '../types'
 
@@ -7,7 +7,7 @@ const projectListState = atom<ProjectInfo[]>({
   default: [],
 })
 
-const projectGroupState = atom<Group | undefined>({
+const projectGroupState = atom<KdbxGroup | undefined>({
   key: 'projectGroupState',
   default: undefined,
 })

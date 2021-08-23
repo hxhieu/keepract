@@ -1,4 +1,4 @@
-import { Group } from 'kdbxweb'
+import { KdbxGroup } from 'kdbxweb'
 import { useEffect, useState } from 'react'
 import { useParams, useRouteMatch } from 'react-router-dom'
 import { useRecoilValue } from 'recoil'
@@ -7,11 +7,11 @@ import { GROUP_IDS_SEPARATOR, KdbxGroupRouteParams, KdbxItem } from '../types'
 import { getKdbxFieldValue } from '../utils'
 
 const buildLoadedGroups = (
-  rootGroup: Group,
+  rootGroup: KdbxGroup,
   allGroups: string[],
   error?: (msg: string) => any
-): [Group, KdbxItem[]] => {
-  let currentGroup: Group | undefined = rootGroup
+): [KdbxGroup, KdbxItem[]] => {
+  let currentGroup: KdbxGroup | undefined = rootGroup
   let groupLevel = 0
   const loadedGroups: KdbxItem[] = []
 
@@ -22,7 +22,7 @@ const buildLoadedGroups = (
     currentGroup = currentGroup?.groups.find((x) => x.uuid.id === nextId)
     if (currentGroup) {
       loadedGroups.push({
-        name: currentGroup.name.toString(),
+        name: currentGroup.name?.toString() || 'UNKNOWN',
         uuid: currentGroup.uuid.id,
         isGroup: true,
       })
@@ -34,10 +34,10 @@ const buildLoadedGroups = (
     }
     groupLevel++
   }
-  return [currentGroup as Group, loadedGroups]
+  return [currentGroup as KdbxGroup, loadedGroups]
 }
 
-const buildCurrentGroup = (currentGroup: Group): KdbxItem[] => {
+const buildCurrentGroup = (currentGroup: KdbxGroup): KdbxItem[] => {
   const { groups, entries } = currentGroup
 
   const items: KdbxItem[] = []
@@ -53,10 +53,11 @@ const buildCurrentGroup = (currentGroup: Group): KdbxItem[] => {
   if (entries)
     entries.forEach((x) => {
       const { fields, uuid } = x
-      const { Title, Notes } = fields
+      const title = fields.get('Title')
+      const notes = fields.get('Notes')
       items.push({
-        name: getKdbxFieldValue(Title),
-        notes: getKdbxFieldValue(Notes),
+        name: getKdbxFieldValue(title) || 'UNKNOWN',
+        notes: getKdbxFieldValue(notes),
         uuid: uuid.id,
       })
     })
@@ -65,19 +66,18 @@ const buildCurrentGroup = (currentGroup: Group): KdbxItem[] => {
 
 const useLoadCurrentGroup = (
   error?: (msg: string) => any
-): [KdbxItem[], KdbxItem[], Group] => {
+): [KdbxItem[], KdbxItem[], KdbxGroup] => {
   const rootGroup = useRecoilValue(projectGroupState)
 
   const { groupIds } = useParams<KdbxGroupRouteParams>()
   const { url } = useRouteMatch()
-  const allGroups = (groupIds
-    ? groupIds.split(GROUP_IDS_SEPARATOR)
-    : []
-  ).map((x) => atob(x))
+  const allGroups = (groupIds ? groupIds.split(GROUP_IDS_SEPARATOR) : []).map(
+    (x) => atob(x)
+  )
 
   const [items, setItems] = useState<KdbxItem[]>([])
   const [loadedGroups, setLoadedGroups] = useState<KdbxItem[]>([])
-  const [selectedGroup, setSelectedGroup] = useState<Group>()
+  const [selectedGroup, setSelectedGroup] = useState<KdbxGroup>()
 
   useEffect(() => {
     if (!rootGroup) {
@@ -97,7 +97,7 @@ const useLoadCurrentGroup = (
     setItems(items)
   }, [rootGroup, url])
 
-  return [items, loadedGroups, selectedGroup as Group]
+  return [items, loadedGroups, selectedGroup as KdbxGroup]
 }
 
 export { useLoadCurrentGroup }
