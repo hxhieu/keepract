@@ -59,7 +59,7 @@ const App: FC = () => {
       setProjects(allProjects)
     }
     loadProjects()
-  }, [user])
+  }, [user, storage, setProjects])
 
   return (
     <Router>
@@ -87,7 +87,7 @@ const App: FC = () => {
         <StickyFooter>
           Mitmeo Vault &copy; {new Date().getFullYear()}
           &nbsp;
-          <a href="https://mitmeo.studio" target="_blank">
+          <a href="https://mitmeo.studio" target="_blank" rel="noreferrer">
             mitmeo.studio
           </a>
         </StickyFooter>
